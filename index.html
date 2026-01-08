@@ -41,8 +41,8 @@ html, body {
 }
 
 .clock {
-  width: 170px;
-  height: 170px;
+  width: 150px;
+  height: 150px;
 }
 
 .clock svg {
@@ -61,7 +61,7 @@ html, body {
 /* Weather */
 .weather-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: 40px;
 }
 
@@ -214,7 +214,7 @@ async function loadWeather(lat, lon, el, city) {
 loadWeather(48.2167, 9.0333, "weather-albstadt", "Albstadt");
 loadWeather(48.6833, 9.0167, "weather-boeblingen", "Böblingen");
 
-/* Markets – Bitcoin + DAX/S&P Platzhalter */
+/* Markets – Bitcoin + Platzhalter DAX/S&P */
 async function loadMarkets() {
   const container = document.getElementById("markets-list");
 
@@ -224,9 +224,9 @@ async function loadMarkets() {
     container.innerHTML = "";
 
     const markets = [
-      { name: "Bitcoin", key: "bitcoin", price: d.bitcoin.eur, change: d.bitcoin.eur_24h_change },
-      { name: "DAX (Proxy)", key: "dax", price: 15800, change: 0.45 },
-      { name: "S&P 500 (Proxy)", key: "sp500", price: 4200, change: -0.21 }
+      { name: "Bitcoin", price: d.bitcoin.eur, change: d.bitcoin.eur_24h_change },
+      { name: "DAX (Proxy)", price: 15800, change: 0.45 },
+      { name: "S&P 500 (Proxy)", price: 4200, change: -0.21 }
     ];
 
     markets.forEach(m=>{
@@ -244,24 +244,20 @@ async function loadMarkets() {
 }
 loadMarkets();
 
-/* News – Tagesschau RSS via CORS-Proxy */
+/* News – GNews API Deutsch */
 async function loadNews() {
   const container = document.getElementById("news-list");
-
   try {
-    const rssUrl = encodeURIComponent("https://www.tagesschau.de/xml/rss2");
-    const res = await fetch(`https://api.allorigins.win/get?url=${rssUrl}`);
-    const text = await res.text();
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(JSON.parse(res._bodyInit || res.text), "application/xml");
-    const items = xmlDoc.querySelectorAll("item");
+    const res = await fetch(
+      "https://gnews.io/api/v4/top-headlines?lang=de&max=6&apikey=230e953770ba4a2d8de64021a4976827"
+    );
+    const data = await res.json();
     container.innerHTML = "";
-    for(let i=0;i<Math.min(items.length,6);i++){
-      const title = items[i].querySelector("title").textContent;
-      container.innerHTML += `<div class="news-item">${i+1}. ${title}</div>`;
-    }
-  } catch(e){
-    container.innerHTML = "Nachrichten nicht verfügbar";
+    data.articles.forEach((a, i) => {
+      container.innerHTML += `<div class="news-item">${i + 1}. ${a.title}</div>`;
+    });
+  } catch(e) {
+    container.innerHTML = "Nachrichten derzeit nicht verfügbar";
   }
 }
 loadNews();

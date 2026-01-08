@@ -23,7 +23,7 @@ html, body {
 .section {
   margin-bottom: 28px;
   padding-bottom: 18px;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 1px solid rgba(255,255,255,0.15); /* Abschnittstrenner */
 }
 
 /* Greeting */
@@ -104,11 +104,19 @@ html, body {
 #news-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  align-items: center; /* mittig */
 }
 
 .news-item {
+  text-align: center;
   font-size: 14px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* sehr dezente Separatoren */
+}
+
+.news-item:last-child {
+  border-bottom: none;
 }
 
 /* Footer */
@@ -257,7 +265,7 @@ async function loadNews() {
     container.innerHTML = "";
     for(let i=0;i<Math.min(items.length,6);i++){
       const title = items[i].querySelector("title").textContent;
-      container.innerHTML += `<div class="news-item">${i+1}. ${title}</div>`;
+      container.innerHTML += `<div class="news-item">${title}</div>`;
     }
   } catch(e){
     container.innerHTML = "Nachrichten derzeit nicht verfügbar";

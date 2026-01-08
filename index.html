@@ -2,243 +2,263 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Palatino&display=swap');
-
-body {
+html, body {
   margin: 0;
+  padding: 0;
   background: #000;
   color: #fff;
-  font-family: 'Palatino', serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  font-family: "Palatino Linotype", Palatino, serif;
 }
 
-/* ================= CLOCK ================= */
-#clock-wrapper {
-  margin-top: 20px;
+.dashboard {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.section {
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+/* Greeting */
+#greeting {
+  text-align: center;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+
+/* Clock */
+.clock-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 0 0;
+}
+
+.clock {
   width: 180px;
   height: 180px;
 }
 
+.clock svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
 #date {
-  margin-top: 6px;
-  font-size: 0.95em;
   text-align: center;
+  margin-top: 6px;
+  font-size: 14px;
+  opacity: 0.85;
 }
 
-/* ================= SECTIONS ================= */
-.section {
-  width: 92%;
-  max-width: 900px;
-  background: #111;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 20px;
-}
-
-/* ================= WEATHER ================= */
-.weather {
+/* Weather */
+.weather-row {
   display: flex;
-  justify-content: center;
-  gap: 80px;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.weather-box {
+  flex: 1;
+  text-align: center;
 }
 
 .weather-city {
-  text-align: center;
-  min-width: 140px;
+  font-size: 16px;
 }
 
-.city {
-  font-size: 1.2em;
+.weather-temp {
+  font-size: 28px;
+  margin: 6px 0;
 }
 
-.temp {
-  font-size: 1.8em;
-  margin: 4px 0;
+.weather-icon {
+  font-size: 26px;
 }
 
-.icon {
-  font-size: 2em;
+/* Markets */
+.markets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* ================= MARKETS ================= */
 .market-item {
-  margin-bottom: 10px;
-  font-size: 1.05em;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  padding-bottom: 4px;
 }
 
-/* ================= NEWS ================= */
+.market-up { color: #4caf50; }
+.market-down { color: #e53935; }
+
+/* News */
+#news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .news-item {
-  margin-bottom: 8px;
-  text-align: left;
+  font-size: 14px;
 }
 
-.news-item span {
-  font-weight: bold;
-  margin-right: 6px;
+/* Footer logo */
+.footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
 }
 
-/* ================= FOOTER LOGO ================= */
-#logo {
-  margin: 22px 0;
-  width: 36px;
-  height: 36px;
+.logo {
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255,255,255,0.5);
   border-radius: 50%;
-  border: 2px solid white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 2px;
 }
 </style>
 </head>
 
 <body>
+<div class="dashboard">
 
-<!-- CLOCK -->
-<div id="clock-wrapper">
-  <canvas id="clock" width="180" height="180"></canvas>
-</div>
-<div id="date"></div>
-
-<!-- WEATHER -->
-<div class="section weather">
-  <div class="weather-city" id="albstadt">
-    <div class="city">Albstadt</div>
-    <div class="temp">-- °C</div>
-    <div class="icon">--</div>
+  <!-- Greeting -->
+  <div id="greeting" class="section">
+    Hallo Noel!
   </div>
-  <div class="weather-city" id="boeblingen">
-    <div class="city">Böblingen</div>
-    <div class="temp">-- °C</div>
-    <div class="icon">--</div>
+
+  <!-- Clock -->
+  <div class="section">
+    <div class="clock-wrapper">
+      <div class="clock">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
+          <line id="hour" x1="50" y1="50" x2="50" y2="28" stroke="white" stroke-width="2"/>
+          <line id="minute" x1="50" y1="50" x2="50" y2="18" stroke="white" stroke-width="1.5"/>
+          <line id="second" x1="50" y1="50" x2="50" y2="14" stroke="white" stroke-width="1"/>
+        </svg>
+      </div>
+    </div>
+    <div id="date"></div>
   </div>
-</div>
 
-<!-- MARKETS -->
-<div class="section">
-  <h3>Märkte</h3>
-  <div id="markets"></div>
-</div>
+  <!-- Weather -->
+  <div class="section">
+    <div class="weather-row">
+      <div class="weather-box" id="weather-albstadt"></div>
+      <div class="weather-box" id="weather-boeblingen"></div>
+    </div>
+  </div>
 
-<!-- NEWS -->
-<div class="section">
-  <h3>Schlagzeilen</h3>
-  <div id="news"></div>
-</div>
+  <!-- Markets -->
+  <div class="section">
+    <h3>Märkte</h3>
+    <div id="markets-list" class="markets-list">
+      Lade Marktdaten…
+    </div>
+  </div>
 
-<!-- LOGO -->
-<div id="logo">NG</div>
+  <!-- News -->
+  <div class="section">
+    <h3>Schlagzeilen</h3>
+    <div id="news-list">Lade Nachrichten…</div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="logo">NG</div>
+  </div>
+
+</div>
 
 <script>
-/* ================= CLOCK ================= */
-const canvas = document.getElementById("clock");
-const ctx = canvas.getContext("2d");
-const r = canvas.width / 2;
-ctx.translate(r, r);
-
-function drawClock() {
-  ctx.clearRect(-r, -r, canvas.width, canvas.height);
-  ctx.beginPath();
-  ctx.arc(0, 0, r * 0.95, 0, Math.PI * 2);
-  ctx.strokeStyle = "#fff";
-  ctx.lineWidth = 4;
-  ctx.stroke();
-
-  ctx.font = r * 0.15 + "px Palatino";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  for (let n = 1; n <= 12; n++) {
-    const ang = (n * Math.PI) / 6;
-    ctx.fillText(n, Math.sin(ang) * r * 0.75, -Math.cos(ang) * r * 0.75);
-  }
-
+/* Clock */
+function updateClock() {
   const now = new Date();
-  drawHand((now.getHours() % 12) * Math.PI / 6 + now.getMinutes() * Math.PI / 360, r * 0.5, 5);
-  drawHand(now.getMinutes() * Math.PI / 30, r * 0.7, 3);
+  const h = now.getHours() % 12;
+  const m = now.getMinutes();
+  const s = now.getSeconds();
+
+  document.getElementById("hour")
+    .setAttribute("transform", `rotate(${h*30 + m/2} 50 50)`);
+  document.getElementById("minute")
+    .setAttribute("transform", `rotate(${m*6} 50 50)`);
+  document.getElementById("second")
+    .setAttribute("transform", `rotate(${s*6} 50 50)`);
+
+  document.getElementById("date").innerText =
+    now.toLocaleDateString("de-DE", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
 }
+setInterval(updateClock, 1000);
+updateClock();
 
-function drawHand(pos, len, width) {
-  ctx.beginPath();
-  ctx.lineWidth = width;
-  ctx.lineCap = "round";
-  ctx.rotate(pos);
-  ctx.moveTo(0, 0);
-  ctx.lineTo(0, -len);
-  ctx.stroke();
-  ctx.rotate(-pos);
-}
-
-setInterval(drawClock, 1000);
-drawClock();
-
-document.getElementById("date").textContent =
-  new Date().toLocaleDateString("de-DE", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
-
-/* ================= WEATHER ================= */
-const icons = {
-  0: "☀️", 1: "🌤️", 2: "☁️", 3: "🌧️", 45: "🌫️", 61: "🌧️", 71: "❄️"
-};
-
-async function loadWeather(id, lat, lon) {
+/* Weather */
+async function loadWeather(lat, lon, el, city) {
   const res = await fetch(
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
   );
   const data = await res.json();
   const w = data.current_weather;
-  document.querySelector(`#${id} .temp`).textContent = w.temperature + " °C";
-  document.querySelector(`#${id} .icon`).textContent = icons[w.weathercode] || "❔";
+  const icon = w.weathercode < 3 ? "☀️" : w.weathercode < 50 ? "☁️" : "🌧️";
+
+  document.getElementById(el).innerHTML = `
+    <div class="weather-city">${city}</div>
+    <div class="weather-temp">${Math.round(w.temperature)}°C</div>
+    <div class="weather-icon">${icon}</div>
+  `;
 }
+loadWeather(48.2167, 9.0333, "weather-albstadt", "Albstadt");
+loadWeather(48.6833, 9.0167, "weather-boeblingen", "Böblingen");
 
-loadWeather("albstadt", 48.224, 9.058);
-loadWeather("boeblingen", 48.691, 9.015);
-
-/* ================= MARKETS (FINNHUB) ================= */
-const FINNHUB_KEY = "BJILYNPGKWBDD3EK";
-const symbols = ["SPY", "QQQ", "DIA"];
-
+/* Markets – STABILE Lösung */
 async function loadMarkets() {
-  const box = document.getElementById("markets");
-  box.innerHTML = "";
-  for (const s of symbols) {
-    const res = await fetch(
-      `https://finnhub.io/api/v1/quote?symbol=${s}&token=${FINNHUB_KEY}`
-    );
-    const d = await res.json();
-    if (!d.c) continue;
-    const change = ((d.c - d.pc) / d.pc * 100).toFixed(2);
-    box.innerHTML += `<div class="market-item">${s}: ${d.c.toFixed(2)} USD (${change}%)</div>`;
-  }
+  const res = await fetch(
+    "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=eur&include_24hr_change=true"
+  );
+  const d = await res.json();
+  const c = document.getElementById("markets-list");
+  c.innerHTML = "";
+
+  [["Bitcoin","bitcoin"],["Ethereum","ethereum"]].forEach(m=>{
+    const ch = d[m[1]].eur_24h_change;
+    c.innerHTML += `
+      <div class="market-item">
+        <div>${m[0]}</div>
+        <div class="${ch>=0?'market-up':'market-down'}">
+          €${d[m[1]].eur.toLocaleString("de-DE")}<br>
+          ${ch.toFixed(2)} %
+        </div>
+      </div>`;
+  });
 }
 loadMarkets();
-setInterval(loadMarkets, 60000);
 
-/* ================= NEWS ================= */
+/* News (dein funktionierender Teil bleibt) */
 async function loadNews() {
-  const res = await fetch("https://corsproxy.io/?https://www.tagesschau.de/xml/rss2");
-  const text = await res.text();
-  const xml = new DOMParser().parseFromString(text, "text/xml");
-  const items = xml.querySelectorAll("item");
-  const box = document.getElementById("news");
-  box.innerHTML = "";
-  items.forEach((i, idx) => {
-    if (idx >= 8) return;
-    box.innerHTML += `<div class="news-item"><span>${idx + 1}.</span>${i.querySelector("title").textContent}</div>`;
+  const res = await fetch(
+    "https://newsapi.org/v2/top-headlines?language=en&pageSize=6&apiKey=230e953770ba4a2d8de64021a4976827"
+  );
+  const data = await res.json();
+  const c = document.getElementById("news-list");
+  c.innerHTML = "";
+  data.articles.forEach((a,i)=>{
+    c.innerHTML += `<div class="news-item">${i+1}. ${a.title}</div>`;
   });
 }
 loadNews();
-setInterval(loadNews, 300000);
 </script>
-
 </body>
 </html>

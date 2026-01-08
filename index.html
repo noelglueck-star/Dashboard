@@ -244,19 +244,22 @@ async function loadMarkets() {
 }
 loadMarkets();
 
-/* News – GNews API Deutsch */
+/* News – Tagesschau RSS via CORS-Proxy */
 async function loadNews() {
   const container = document.getElementById("news-list");
   try {
-    const res = await fetch(
-      "https://gnews.io/api/v4/top-headlines?lang=de&max=6&apikey=230e953770ba4a2d8de64021a4976827"
-    );
-    const data = await res.json();
+    const rssUrl = encodeURIComponent("https://www.tagesschau.de/xml/rss2");
+    const res = await fetch(`https://api.allorigins.win/get?url=${rssUrl}`);
+    const data = await res.json(); // data.contents enthält RSS-XML
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(data.contents, "application/xml");
+    const items = xmlDoc.querySelectorAll("item");
     container.innerHTML = "";
-    data.articles.forEach((a, i) => {
-      container.innerHTML += `<div class="news-item">${i + 1}. ${a.title}</div>`;
-    });
-  } catch(e) {
+    for(let i=0;i<Math.min(items.length,6);i++){
+      const title = items[i].querySelector("title").textContent;
+      container.innerHTML += `<div class="news-item">${i+1}. ${title}</div>`;
+    }
+  } catch(e){
     container.innerHTML = "Nachrichten derzeit nicht verfügbar";
   }
 }

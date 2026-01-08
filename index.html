@@ -11,7 +11,7 @@ html, body {
   padding: 0;
   background: #000;
   color: #fff;
-  font-family: "Palatino Linotype", Palatino, serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .dashboard {
@@ -37,12 +37,12 @@ html, body {
 .clock-wrapper {
   display: flex;
   justify-content: center;
-  padding: 10px 0 0 0;
+  padding-top: 10px;
 }
 
 .clock {
-  width: 180px;
-  height: 180px;
+  width: 170px;
+  height: 170px;
 }
 
 .clock svg {
@@ -111,7 +111,7 @@ html, body {
   font-size: 14px;
 }
 
-/* Footer logo */
+/* Footer */
 .footer {
   display: flex;
   justify-content: center;
@@ -119,14 +119,14 @@ html, body {
 }
 
 .logo {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border: 1px solid rgba(255,255,255,0.5);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: 2px;
 }
 </style>
@@ -136,9 +136,7 @@ html, body {
 <div class="dashboard">
 
   <!-- Greeting -->
-  <div id="greeting" class="section">
-    Hallo Noel!
-  </div>
+  <div id="greeting" class="section">Hallo Noel!</div>
 
   <!-- Clock -->
   <div class="section">
@@ -146,9 +144,9 @@ html, body {
       <div class="clock">
         <svg viewBox="0 0 100 100">
           <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
-          <line id="hour" x1="50" y1="50" x2="50" y2="28" stroke="white" stroke-width="2"/>
-          <line id="minute" x1="50" y1="50" x2="50" y2="18" stroke="white" stroke-width="1.5"/>
-          <line id="second" x1="50" y1="50" x2="50" y2="14" stroke="white" stroke-width="1"/>
+          <line id="hour" x1="50" y1="50" x2="50" y2="30" stroke="white" stroke-width="2"/>
+          <line id="minute" x1="50" y1="50" x2="50" y2="20" stroke="white" stroke-width="1.5"/>
+          <line id="second" x1="50" y1="50" x2="50" y2="16" stroke="white" stroke-width="1"/>
         </svg>
       </div>
     </div>
@@ -166,9 +164,7 @@ html, body {
   <!-- Markets -->
   <div class="section">
     <h3>Märkte</h3>
-    <div id="markets-list" class="markets-list">
-      Lade Marktdaten…
-    </div>
+    <div id="markets-list" class="markets-list">Lade Marktdaten…</div>
   </div>
 
   <!-- News -->
@@ -200,12 +196,17 @@ function updateClock() {
     .setAttribute("transform", `rotate(${s*6} 50 50)`);
 
   document.getElementById("date").innerText =
-    now.toLocaleDateString("de-DE", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+    now.toLocaleDateString("de-DE", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
 }
 setInterval(updateClock, 1000);
 updateClock();
 
-/* Weather */
+/* Weather – Open-Meteo */
 async function loadWeather(lat, lon, el, city) {
   const res = await fetch(
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
@@ -220,44 +221,62 @@ async function loadWeather(lat, lon, el, city) {
     <div class="weather-icon">${icon}</div>
   `;
 }
+
 loadWeather(48.2167, 9.0333, "weather-albstadt", "Albstadt");
 loadWeather(48.6833, 9.0167, "weather-boeblingen", "Böblingen");
 
-/* Markets – STABILE Lösung */
+/* Markets – stabile CoinGecko-Proxies */
 async function loadMarkets() {
   const res = await fetch(
-    "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=eur&include_24hr_change=true"
+    "https://api.coingecko.com/api/v3/simple/price?" +
+    "ids=bitcoin,coingecko-market-cap-index-europe,coingecko-market-cap-index-us" +
+    "&vs_currencies=eur&include_24hr_change=true"
   );
+
   const d = await res.json();
   const c = document.getElementById("markets-list");
   c.innerHTML = "";
 
-  [["Bitcoin","bitcoin"],["Ethereum","ethereum"]].forEach(m=>{
-    const ch = d[m[1]].eur_24h_change;
+  const markets = [
+    { name: "Bitcoin", key: "bitcoin" },
+    { name: "Europe Market", key: "coingecko-market-cap-index-europe" },
+    { name: "US Market", key: "coingecko-market-cap-index-us" }
+  ];
+
+  markets.forEach(m => {
+    const price = d[m.key].eur;
+    const change = d[m.key].eur_24h_change;
+    const cls = change >= 0 ? "market-up" : "market-down";
+
     c.innerHTML += `
       <div class="market-item">
-        <div>${m[0]}</div>
-        <div class="${ch>=0?'market-up':'market-down'}">
-          €${d[m[1]].eur.toLocaleString("de-DE")}<br>
-          ${ch.toFixed(2)} %
+        <div>${m.name}</div>
+        <div class="${cls}">
+          €${price.toLocaleString("de-DE")}<br>
+          ${change.toFixed(2)} %
         </div>
-      </div>`;
+      </div>
+    `;
   });
 }
+
 loadMarkets();
 
-/* News (dein funktionierender Teil bleibt) */
+/* News – GNews (stabil für Frontend) */
 async function loadNews() {
   const res = await fetch(
-    "https://newsapi.org/v2/top-headlines?language=en&pageSize=6&apiKey=230e953770ba4a2d8de64021a4976827"
+    "https://gnews.io/api/v4/top-headlines?lang=en&country=us&max=6&apikey=230e953770ba4a2d8de64021a4976827"
   );
+
   const data = await res.json();
   const c = document.getElementById("news-list");
   c.innerHTML = "";
-  data.articles.forEach((a,i)=>{
-    c.innerHTML += `<div class="news-item">${i+1}. ${a.title}</div>`;
+
+  data.articles.forEach((a, i) => {
+    c.innerHTML += `<div class="news-item">${i + 1}. ${a.title}</div>`;
   });
 }
+
 loadNews();
 </script>
 </body>

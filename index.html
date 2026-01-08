@@ -11,7 +11,7 @@ html, body {
   padding: 0;
   background: #000;
   color: #fff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Palatino, "Palatino Linotype", serif;
 }
 
 .dashboard {
@@ -188,29 +188,19 @@ function updateClock() {
   const m = now.getMinutes();
   const s = now.getSeconds();
 
-  document.getElementById("hour")
-    .setAttribute("transform", `rotate(${h*30 + m/2} 50 50)`);
-  document.getElementById("minute")
-    .setAttribute("transform", `rotate(${m*6} 50 50)`);
-  document.getElementById("second")
-    .setAttribute("transform", `rotate(${s*6} 50 50)`);
+  document.getElementById("hour").setAttribute("transform", `rotate(${h*30 + m/2} 50 50)`);
+  document.getElementById("minute").setAttribute("transform", `rotate(${m*6} 50 50)`);
+  document.getElementById("second").setAttribute("transform", `rotate(${s*6} 50 50)`);
 
   document.getElementById("date").innerText =
-    now.toLocaleDateString("de-DE", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    });
+    now.toLocaleDateString("de-DE", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
 }
 setInterval(updateClock, 1000);
 updateClock();
 
 /* Weather – Open-Meteo */
 async function loadWeather(lat, lon, el, city) {
-  const res = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
-  );
+  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
   const data = await res.json();
   const w = data.current_weather;
   const icon = w.weathercode < 3 ? "☀️" : w.weathercode < 50 ? "☁️" : "🌧️";
@@ -221,62 +211,59 @@ async function loadWeather(lat, lon, el, city) {
     <div class="weather-icon">${icon}</div>
   `;
 }
-
 loadWeather(48.2167, 9.0333, "weather-albstadt", "Albstadt");
 loadWeather(48.6833, 9.0167, "weather-boeblingen", "Böblingen");
 
-/* Markets – stabile CoinGecko-Proxies */
+/* Markets – Bitcoin + DAX/S&P Platzhalter */
 async function loadMarkets() {
-  const res = await fetch(
-    "https://api.coingecko.com/api/v3/simple/price?" +
-    "ids=bitcoin,coingecko-market-cap-index-europe,coingecko-market-cap-index-us" +
-    "&vs_currencies=eur&include_24hr_change=true"
-  );
+  const container = document.getElementById("markets-list");
 
-  const d = await res.json();
-  const c = document.getElementById("markets-list");
-  c.innerHTML = "";
+  try {
+    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur&include_24hr_change=true");
+    const d = await res.json();
+    container.innerHTML = "";
 
-  const markets = [
-    { name: "Bitcoin", key: "bitcoin" },
-    { name: "Europe Market", key: "coingecko-market-cap-index-europe" },
-    { name: "US Market", key: "coingecko-market-cap-index-us" }
-  ];
+    const markets = [
+      { name: "Bitcoin", key: "bitcoin", price: d.bitcoin.eur, change: d.bitcoin.eur_24h_change },
+      { name: "DAX (Proxy)", key: "dax", price: 15800, change: 0.45 },
+      { name: "S&P 500 (Proxy)", key: "sp500", price: 4200, change: -0.21 }
+    ];
 
-  markets.forEach(m => {
-    const price = d[m.key].eur;
-    const change = d[m.key].eur_24h_change;
-    const cls = change >= 0 ? "market-up" : "market-down";
+    markets.forEach(m=>{
+      const cls = m.change>=0 ? "market-up" : "market-down";
+      container.innerHTML += `
+        <div class="market-item">
+          <div>${m.name}</div>
+          <div class="${cls}">€${m.price.toLocaleString("de-DE")}<br>${m.change.toFixed(2)} %</div>
+        </div>`;
+    });
 
-    c.innerHTML += `
-      <div class="market-item">
-        <div>${m.name}</div>
-        <div class="${cls}">
-          €${price.toLocaleString("de-DE")}<br>
-          ${change.toFixed(2)} %
-        </div>
-      </div>
-    `;
-  });
+  } catch(e){
+    container.innerHTML = "Marktdaten nicht verfügbar";
+  }
 }
-
 loadMarkets();
 
-/* News – GNews (stabil für Frontend) */
+/* News – Tagesschau RSS via CORS-Proxy */
 async function loadNews() {
-  const res = await fetch(
-    "https://gnews.io/api/v4/top-headlines?lang=en&country=us&max=6&apikey=230e953770ba4a2d8de64021a4976827"
-  );
+  const container = document.getElementById("news-list");
 
-  const data = await res.json();
-  const c = document.getElementById("news-list");
-  c.innerHTML = "";
-
-  data.articles.forEach((a, i) => {
-    c.innerHTML += `<div class="news-item">${i + 1}. ${a.title}</div>`;
-  });
+  try {
+    const rssUrl = encodeURIComponent("https://www.tagesschau.de/xml/rss2");
+    const res = await fetch(`https://api.allorigins.win/get?url=${rssUrl}`);
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(JSON.parse(res._bodyInit || res.text), "application/xml");
+    const items = xmlDoc.querySelectorAll("item");
+    container.innerHTML = "";
+    for(let i=0;i<Math.min(items.length,6);i++){
+      const title = items[i].querySelector("title").textContent;
+      container.innerHTML += `<div class="news-item">${i+1}. ${title}</div>`;
+    }
+  } catch(e){
+    container.innerHTML = "Nachrichten nicht verfügbar";
+  }
 }
-
 loadNews();
 </script>
 </body>

@@ -15,34 +15,34 @@ html, body {
 }
 
 .dashboard {
-  max-width: 520px;
+  max-width: 480px; /* kompakter */
   margin: 0 auto;
   padding: 20px;
 }
 
 .section {
-  margin-bottom: 28px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(255,255,255,0.15); /* Abschnittstrenner */
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
 }
 
 /* Greeting */
 #greeting {
   text-align: center;
-  font-size: 22px;
+  font-size: 20px;
   letter-spacing: 1px;
+  margin-bottom: 8px;
 }
 
 /* Clock */
 .clock-wrapper {
   display: flex;
   justify-content: center;
-  padding-top: 10px;
 }
 
 .clock {
-  width: 150px;
-  height: 150px;
+  width: 110px;
+  height: 110px;
 }
 
 .clock svg {
@@ -53,8 +53,8 @@ html, body {
 
 #date {
   text-align: center;
-  margin-top: 6px;
-  font-size: 14px;
+  margin-top: 4px;
+  font-size: 13px;
   opacity: 0.85;
 }
 
@@ -71,30 +71,30 @@ html, body {
 }
 
 .weather-city {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .weather-temp {
-  font-size: 28px;
-  margin: 6px 0;
+  font-size: 24px;
+  margin: 4px 0;
 }
 
 .weather-icon {
-  font-size: 26px;
+  font-size: 24px;
 }
 
 /* Markets */
 .markets-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .market-item {
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,0.12);
-  padding-bottom: 4px;
+  padding-bottom: 3px;
 }
 
 .market-up { color: #4caf50; }
@@ -104,15 +104,23 @@ html, body {
 #news-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   align-items: center; /* mittig */
 }
 
 .news-item {
   text-align: center;
-  font-size: 14px;
-  padding: 4px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* sehr dezente Separatoren */
+  font-size: 13px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.news-item.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .news-item:last-child {
@@ -123,19 +131,19 @@ html, body {
 .footer {
   display: flex;
   justify-content: center;
-  margin-top: 18px;
+  margin-top: 14px;
 }
 
 .logo {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border: 1px solid rgba(255,255,255,0.5);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  letter-spacing: 2px;
+  font-size: 13px;
+  letter-spacing: 1.5px;
 }
 </style>
 </head>
@@ -208,24 +216,27 @@ updateClock();
 
 /* Weather – Open-Meteo */
 async function loadWeather(lat, lon, el, city) {
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-  const data = await res.json();
-  const w = data.current_weather;
-  const icon = w.weathercode < 3 ? "☀️" : w.weathercode < 50 ? "☁️" : "🌧️";
+  try {
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+    const data = await res.json();
+    const w = data.current_weather;
+    const icon = w.weathercode < 3 ? "☀️" : w.weathercode < 50 ? "☁️" : "🌧️";
 
-  document.getElementById(el).innerHTML = `
-    <div class="weather-city">${city}</div>
-    <div class="weather-temp">${Math.round(w.temperature)}°C</div>
-    <div class="weather-icon">${icon}</div>
-  `;
+    document.getElementById(el).innerHTML = `
+      <div class="weather-city">${city}</div>
+      <div class="weather-temp">${Math.round(w.temperature)}°C</div>
+      <div class="weather-icon">${icon}</div>
+    `;
+  } catch(e){
+    document.getElementById(el).innerHTML = "Wetter nicht verfügbar";
+  }
 }
 loadWeather(48.2167, 9.0333, "weather-albstadt", "Albstadt");
 loadWeather(48.6833, 9.0167, "weather-boeblingen", "Böblingen");
 
-/* Markets – Bitcoin + Platzhalter DAX/S&P */
+/* Markets – Bitcoin + Proxy DAX/S&P */
 async function loadMarkets() {
   const container = document.getElementById("markets-list");
-
   try {
     const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur&include_24hr_change=true");
     const d = await res.json();
@@ -252,26 +263,73 @@ async function loadMarkets() {
 }
 loadMarkets();
 
-/* News – Tagesschau RSS via CORS-Proxy */
+/* News – Tagesschau + Fallbacks (max. 4 Headlines, sanft einblendend) */
+async function fetchRSS(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Fetch failed");
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(text, "application/xml");
+    const items = xmlDoc.querySelectorAll("item");
+    const headlines = [];
+    for (let i = 0; i < Math.min(items.length, 4); i++) {
+      headlines.push(items[i].querySelector("title").textContent);
+    }
+    if (headlines.length === 0) throw new Error("No headlines");
+    return headlines;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function loadNews() {
   const container = document.getElementById("news-list");
-  try {
-    const rssUrl = encodeURIComponent("https://www.tagesschau.de/xml/rss2");
-    const res = await fetch(`https://api.allorigins.win/get?url=${rssUrl}`);
-    const data = await res.json(); // data.contents enthält RSS-XML
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(data.contents, "application/xml");
-    const items = xmlDoc.querySelectorAll("item");
-    container.innerHTML = "";
-    for(let i=0;i<Math.min(items.length,6);i++){
-      const title = items[i].querySelector("title").textContent;
-      container.innerHTML += `<div class="news-item">${title}</div>`;
+  container.innerHTML = "Lade Nachrichten…";
+
+  const sources = [
+    "https://api.allorigins.win/get?url=" + encodeURIComponent("https://www.tagesschau.de/xml/rss2"),
+    "https://www.tagesschau.de/xml/rss2",
+    "https://www.spiegel.de/schlagzeilen/tops/index.rss"
+  ];
+
+  let headlines = null;
+
+  for (let src of sources) {
+    if (src.includes("allorigins")) {
+      try {
+        const res = await fetch(src);
+        const json = await res.json();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(json.contents, "application/xml");
+        const items = xmlDoc.querySelectorAll("item");
+        headlines = [];
+        for (let i = 0; i < Math.min(items.length, 4); i++) {
+          headlines.push(items[i].querySelector("title").textContent);
+        }
+      } catch(e){ headlines = null; }
+    } else {
+      headlines = await fetchRSS(src);
     }
-  } catch(e){
+    if (headlines && headlines.length>0) break;
+  }
+
+  if (headlines && headlines.length>0) {
+    container.innerHTML = "";
+    headlines.forEach((title, index)=>{
+      const div = document.createElement("div");
+      div.className = "news-item";
+      div.textContent = title;
+      container.appendChild(div);
+      setTimeout(() => div.classList.add("visible"), index * 150); // sanft einblenden
+    });
+  } else {
     container.innerHTML = "Nachrichten derzeit nicht verfügbar";
   }
 }
 loadNews();
+setInterval(loadNews, 5*60*1000);
 </script>
+
 </body>
 </html>

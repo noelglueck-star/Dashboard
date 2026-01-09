@@ -14,10 +14,33 @@
     align-items: center;
   }
 
+  /* Hauptuhr oben */
+  #main-clock {
+    width: 120px;
+    height: 120px;
+    border: 3px solid white;
+    border-radius: 50%;
+    position: relative;
+    margin: 20px 0 5px 0;
+  }
+  .hand {
+    position: absolute;
+    width: 50%;
+    height: 2px;
+    background: white;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0% 50%;
+  }
+  #date {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 16px;
+  }
+
   /* Header */
   #header {
     font-size: 24px;
-    margin-top: 10px;
     text-align: center;
   }
 
@@ -46,7 +69,7 @@
     border-left: 1px solid rgba(255,255,255,0.3);
     padding-left: 10px;
   }
-  .market:first-child { border-left: none; padding-left:0; }
+  .market:first-child { border-left:none; padding-left:0; }
 
   /* Schlagzeilen */
   .news {
@@ -83,15 +106,6 @@
     position: relative;
     margin-bottom: 2px;
   }
-  .hand {
-    position: absolute;
-    width: 50%;
-    height: 2px;
-    background: white;
-    top: 50%;
-    left: 50%;
-    transform-origin: 0% 50%;
-  }
 
   /* Logo */
   #logo {
@@ -107,6 +121,13 @@
 <body>
 
 <div id="header">Hallo Noel!</div>
+
+<!-- Hauptuhr -->
+<div id="main-clock">
+  <div class="hand" id="main-hour"></div>
+  <div class="hand" id="main-minute" style="height:1.5px;"></div>
+</div>
+<div id="date"></div>
 
 <!-- Wetter -->
 <div class="weather-container">
@@ -158,7 +179,22 @@
 <div id="logo">NG</div>
 
 <script>
-/* Schlagzeilen (Dummy, kann API nutzen) */
+/* ===================== Hauptuhr ===================== */
+function updateMainClock() {
+  const now = new Date();
+  const hours = now.getHours() % 12;
+  const minutes = now.getMinutes();
+  document.getElementById('main-hour').style.transform = `rotate(${hours*30 + minutes*0.5}deg)`;
+  document.getElementById('main-minute').style.transform = `rotate(${minutes*6}deg)`;
+
+  // Datum
+  const options = { weekday:'long', year:'numeric', month:'long', day:'numeric'};
+  document.getElementById('date').textContent = now.toLocaleDateString('de-DE', options);
+}
+updateMainClock();
+setInterval(updateMainClock,1000);
+
+/* ===================== Schlagzeilen ===================== */
 const news = [
   "Wichtige Nachricht 1",
   "Top Story 2",
@@ -174,7 +210,7 @@ news.forEach(n => {
   newsContainer.appendChild(div);
 });
 
-/* Weltuhren */
+/* ===================== Weltuhren ===================== */
 function updateClock(hourId, minuteId, offset) {
   const now = new Date();
   const utc = now.getTime() + (now.getTimezoneOffset() * 60000);

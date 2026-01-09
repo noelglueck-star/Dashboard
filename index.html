@@ -33,7 +33,7 @@
   .weather .temp { font-size: 22px; font-weight: bold; }
   .weather .icon { font-size: 20px; margin-top: 5px; }
 
-  /* Märkte */
+  /* Märkte nebeneinander, alle mit Strich links */
   .markets {
     display: flex;
     justify-content: center;
@@ -46,7 +46,7 @@
     border-left: 1px solid rgba(255,255,255,0.3);
     padding-left: 10px;
   }
-  .market.sp500 { border-left: none; padding-left: 0; }
+  .market:first-child { border-left: none; padding-left:0; }
 
   /* Schlagzeilen */
   .news {
@@ -125,7 +125,7 @@
 <!-- Märkte -->
 <div class="markets">
   <div class="market" id="bitcoin">BTC<br>23.500€<br>+1.2%</div>
-  <div class="market sp500" id="sp500">S&P 500<br>4.250$<br>+0.5%</div>
+  <div class="market" id="sp500">S&P 500<br>4.250$<br>+0.5%</div>
   <div class="market" id="dax-etf">DAX-ETF<br>15.300€<br>+0.7%</div>
 </div>
 
@@ -158,7 +158,7 @@
 <div id="logo">NG</div>
 
 <script>
-/* ========== Dummy Schlagzeilen ========== */
+/* Schlagzeilen (Dummy, kann API nutzen) */
 const news = [
   "Wichtige Nachricht 1",
   "Top Story 2",
@@ -174,31 +174,25 @@ news.forEach(n => {
   newsContainer.appendChild(div);
 });
 
-/* ========== Weltuhren ========== */
+/* Weltuhren */
 function updateClock(hourId, minuteId, offset) {
   const now = new Date();
   const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
   const cityTime = new Date(utc + (3600000 * offset));
   const hours = cityTime.getHours() % 12;
   const minutes = cityTime.getMinutes();
-
   document.getElementById(hourId).style.transform = `rotate(${hours*30 + minutes*0.5}deg)`;
   document.getElementById(minuteId).style.transform = `rotate(${minutes*6}deg)`;
 }
-
-// Offset in Stunden von UTC
 const clocks = [
   {h:'atlanta-hour', m:'atlanta-minute', offset:-5},
   {h:'seoul-hour', m:'seoul-minute', offset:9},
   {h:'peking-hour', m:'peking-minute', offset:8},
   {h:'tokio-hour', m:'tokio-minute', offset:9},
 ];
-
-function updateAllClocks() {
-  clocks.forEach(c => updateClock(c.h, c.m, c.offset));
-}
+function updateAllClocks() { clocks.forEach(c => updateClock(c.h,c.m,c.offset)); }
 updateAllClocks();
-setInterval(updateAllClocks, 1000);
+setInterval(updateAllClocks,1000);
 </script>
 
 </body>

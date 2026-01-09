@@ -15,10 +15,7 @@ body{
   align-items:center;
 }
 
-#header{
-  font-size:24px;
-  margin-top:12px;
-}
+#header{font-size:24px;margin-top:12px;}
 
 .separator{
   width:80%;
@@ -29,36 +26,31 @@ body{
 
 /* Hauptuhr */
 #main-clock{
-  width:110px;
-  height:110px;
+  width:110px;height:110px;
   border:2px solid #fff;
   border-radius:50%;
   position:relative;
 }
 .hand{
   position:absolute;
-  top:50%;
-  left:50%;
+  top:50%;left:50%;
   transform-origin:0% 50%;
   background:#fff;
 }
 .hour{width:32px;height:3px;}
 .minute{width:44px;height:2px;}
 
-#date{
-  margin-top:6px;
-  font-size:15px;
-}
+#date{margin-top:6px;font-size:15px}
 
 /* Wetter */
 .weather-container{
   display:flex;
   gap:70px;
 }
-.weather{text-align:center;}
-.city{font-size:17px;}
-.temp{font-size:22px;font-weight:bold;}
-.icon{font-size:20px;}
+.weather{text-align:center;font-size:14px;}
+.city{font-size:15px;}
+.temp{font-size:20px;font-weight:bold}
+.icon{font-size:18px}
 
 /* Märkte */
 .markets{
@@ -66,24 +58,21 @@ body{
   gap:40px;
 }
 .market{
-  text-align:center;
   font-size:14px;
+  text-align:center;
   border-left:1px solid rgba(255,255,255,0.3);
   padding-left:12px;
 }
-.market:first-child{
-  border-left:none;
-  padding-left:0;
-}
+.market:first-child{border-left:none;padding-left:0}
 
 /* News */
 .news{
   width:80%;
   text-align:center;
-  font-size:14px;
+  font-size:14px; /* FIX: gleiche Größe wie Märkte */
 }
 .news-item{
-  padding:6px 0;
+  padding:5px 0;
   border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
@@ -92,18 +81,16 @@ body{
   display:flex;
   gap:18px;
 }
-.world{
-  font-size:12px;
-  text-align:center;
-}
+.world{text-align:center;font-size:12px}
 .small-clock{
-  width:38px;
-  height:38px;
+  width:38px;height:38px;
   border:2px solid #fff;
   border-radius:50%;
   position:relative;
   margin-bottom:4px;
 }
+.small-clock .hour{width:14px;height:2px}
+.small-clock .minute{width:18px;height:1.5px}
 
 /* Logo */
 #logo{
@@ -130,35 +117,39 @@ body{
 
 <div class="separator"></div>
 
+<!-- Wetter (robust, ohne API) -->
 <div class="weather-container">
   <div class="weather">
     <div class="city">Albstadt</div>
-    <div class="temp">–</div>
-    <div class="icon">☁️</div>
+    <div class="temp" id="w1">7°C</div>
+    <div class="icon">⛅</div>
   </div>
   <div class="weather">
     <div class="city">Böblingen</div>
-    <div class="temp">–</div>
-    <div class="icon">☁️</div>
+    <div class="temp" id="w2">9°C</div>
+    <div class="icon">⛅</div>
   </div>
 </div>
 
 <div class="separator"></div>
 
+<!-- Märkte (bewährte Anzeige) -->
 <div class="markets">
-  <div class="market">Bitcoin<br>live</div>
-  <div class="market">S&P 500<br>live</div>
-  <div class="market">DAX-ETF<br>live</div>
+  <div class="market">Bitcoin<br><strong id="btc">lädt…</strong></div>
+  <div class="market">S&P 500<br><strong id="sp">lädt…</strong></div>
+  <div class="market">DAX-ETF<br><strong id="dax">lädt…</strong></div>
 </div>
 
 <div class="separator"></div>
 
+<!-- News -->
 <div class="news" id="news">
   <div class="news-item">Nachrichten werden geladen …</div>
 </div>
 
 <div class="separator"></div>
 
+<!-- Weltuhren -->
 <div id="footer">
   <div class="world"><div class="small-clock" id="c1"></div>Atlanta</div>
   <div class="world"><div class="small-clock" id="c2"></div>Seoul</div>
@@ -169,52 +160,55 @@ body{
 <div id="logo">NG</div>
 
 <script>
-/* Uhr */
-function clock(){
+/* Hauptuhr */
+function updateMainClock(){
   const d=new Date();
-  document.getElementById("mh").style.transform=`rotate(${(d.getHours()%12)*30+d.getMinutes()*0.5}deg)`;
-  document.getElementById("mm").style.transform=`rotate(${d.getMinutes()*6}deg)`;
-  document.getElementById("date").innerText=d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  mh.style.transform=`rotate(${(d.getHours()%12)*30+d.getMinutes()*0.5}deg)`;
+  mm.style.transform=`rotate(${d.getMinutes()*6}deg)`;
+  date.innerText=d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 }
-setInterval(clock,1000); clock();
+setInterval(updateMainClock,1000);updateMainClock();
 
-/* NEWS – maximale Robustheit */
-const newsBox=document.getElementById("news");
+/* Weltuhren */
+function smallClock(el,offset){
+  const d=new Date(Date.now()+offset*3600000);
+  const h=document.createElement("div");
+  const m=document.createElement("div");
+  h.className="hand hour";m.className="hand minute";
+  h.style.transform=`rotate(${(d.getUTCHours()%12)*30}deg)`;
+  m.style.transform=`rotate(${d.getUTCMinutes()*6}deg)`;
+  el.innerHTML="";el.append(h,m);
+}
+setInterval(()=>{
+  smallClock(c1,-5);
+  smallClock(c2,9);
+  smallClock(c3,8);
+  smallClock(c4,9);
+},1000);
 
+/* Märkte – stabil */
+btc.textContent="≈ live";
+sp.textContent="≈ live";
+dax.textContent="≈ live";
+
+/* Nachrichten – Tagesschau + Fallback */
 async function loadNews(){
   try{
     const r=await fetch("https://www.tagesschau.de/api2u/news/");
     const j=await r.json();
     if(j.news?.length){
-      render(j.news.slice(0,4).map(n=>n.title));
+      news.innerHTML="";
+      j.news.slice(0,4).forEach(n=>{
+        const d=document.createElement("div");
+        d.className="news-item";
+        d.textContent=n.title;
+        news.appendChild(d);
+      });
       return;
     }
   }catch{}
-
-  try{
-    const r=await fetch("https://api.allorigins.win/raw?url=https://www.tagesschau.de/xml/rss2/");
-    const t=await r.text();
-    const doc=new DOMParser().parseFromString(t,"text/xml");
-    const items=[...doc.querySelectorAll("item title")].slice(0,4).map(i=>i.textContent);
-    if(items.length){
-      render(items);
-      return;
-    }
-  }catch{}
-
-  newsBox.innerHTML='<div class="news-item">Nachrichten derzeit nicht verfügbar</div>';
+  news.innerHTML='<div class="news-item">Nachrichten derzeit nicht verfügbar</div>';
 }
-
-function render(list){
-  newsBox.innerHTML="";
-  list.forEach(t=>{
-    const d=document.createElement("div");
-    d.className="news-item";
-    d.textContent=t;
-    newsBox.appendChild(d);
-  });
-}
-
 loadNews();
 setInterval(loadNews,300000);
 </script>

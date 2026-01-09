@@ -309,19 +309,20 @@ async function loadWeather(lat, lon, el, city) {
 loadWeather(48.2167,9.0333,"weather-albstadt","Albstadt");
 loadWeather(48.6833,9.0167,"weather-boeblingen","Böblingen");
 
-/* Markets horizontal mit CoinGecko */
+/* Markets horizontal – Bitcoin, S&P 500, MSCI EAFE ETF */
 async function loadMarkets() {
   const container = document.getElementById("markets-list");
   try {
-    const ids = ["bitcoin","spdr-s-p-500-etf-ondo-tokenized-etf","iShares-msci-japan-etf"];
-    const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(",")}&vs_currencies=eur&include_24hr_change=true`);
+    const res = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,spdr-s-p-500-etf-ondo-tokenized-etf,ishares-core-msci-eafe-etf-ondo-tokenized-etf&vs_currencies=eur&include_24hr_change=true"
+    );
     const d = await res.json();
     container.innerHTML = "";
 
     const markets = [
-      { name: "Bitcoin", price: d.bitcoin?.eur??0, change: d.bitcoin?.eur_24h_change??0 },
-      { name: "S&P 500", price: d["spdr-s-p-500-etf-ondo-tokenized-etf"]?.eur??0, change: d["spdr-s-p-500-etf-ondo-tokenized-etf"]?.eur_24h_change??0 },
-      { name: "Japan ETF", price: d["iShares-msci-japan-etf"]?.eur??0, change: d["iShares-msci-japan-etf"]?.eur_24h_change??0 }
+      { name: "Bitcoin", price: d.bitcoin.eur, change: d.bitcoin.eur_24h_change },
+      { name: "S&P 500", price: d["spdr-s-p-500-etf-ondo-tokenized-etf"].eur, change: d["spdr-s-p-500-etf-ondo-tokenized-etf"].eur_24h_change },
+      { name: "MSCI EAFE", price: d["ishares-core-msci-eafe-etf-ondo-tokenized-etf"].eur, change: d["ishares-core-msci-eafe-etf-ondo-tokenized-etf"].eur_24h_change }
     ];
 
     markets.forEach(m=>{
@@ -406,6 +407,5 @@ async function loadNews() {
 loadNews();
 setInterval(loadNews, 5*60*1000);
 </script>
-
 </body>
 </html>

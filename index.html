@@ -14,7 +14,14 @@
     align-items: center;
   }
 
-  /* Wetter (optional, hier nur Platzhalter) */
+  /* Header */
+  #header {
+    font-size: 24px;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  /* Wetter nebeneinander */
   .weather-container {
     display: flex;
     justify-content: center;
@@ -22,6 +29,9 @@
     margin: 20px 0;
   }
   .weather { text-align:center; }
+  .weather .city { font-size: 18px; margin-bottom: 5px; }
+  .weather .temp { font-size: 22px; font-weight: bold; }
+  .weather .icon { font-size: 20px; margin-top: 5px; }
 
   /* Märkte */
   .markets {
@@ -36,34 +46,54 @@
     border-left: 1px solid rgba(255,255,255,0.3);
     padding-left: 10px;
   }
-  .market.sp500 {
-    border-left: none; /* Kein Strich unter S&P500 */
-    padding-left: 0;
+  .market.sp500 { border-left: none; padding-left: 0; }
+
+  /* Schlagzeilen */
+  .news {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .news-item {
+    margin: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 3px;
   }
 
-  /* Footer: Verkehr + Radar */
+  /* Footer: Weltuhren */
   #footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     font-size: 14px;
     margin-top: 15px;
   }
-  .traffic-radar {
-    width: 12px;
-    height: 12px;
-    border: 1px solid rgba(255,255,255,0.7);
-    border-radius: 50%;
-    animation: pulse 1.5s infinite ease-in-out;
+  .world-clock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
   }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
-    70% { box-shadow: 0 0 6px 3px rgba(255,255,255,0); }
-    100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  .analog-clock {
+    width: 40px;
+    height: 40px;
+    border: 2px solid white;
+    border-radius: 50%;
+    position: relative;
+    margin-bottom: 2px;
+  }
+  .hand {
+    position: absolute;
+    width: 50%;
+    height: 2px;
+    background: white;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0% 50%;
   }
 
-  /* Logo Initialen */
+  /* Logo */
   #logo {
     position: absolute;
     bottom: 5px;
@@ -72,10 +102,25 @@
     text-align: center;
     width: 100%;
   }
-
 </style>
 </head>
 <body>
+
+<div id="header">Hallo Noel!</div>
+
+<!-- Wetter -->
+<div class="weather-container">
+  <div class="weather" id="weather-albstadt">
+    <div class="city">Albstadt</div>
+    <div class="temp">5°C</div>
+    <div class="icon">☀️</div>
+  </div>
+  <div class="weather" id="weather-boeblingen">
+    <div class="city">Böblingen</div>
+    <div class="temp">7°C</div>
+    <div class="icon">☀️</div>
+  </div>
+</div>
 
 <!-- Märkte -->
 <div class="markets">
@@ -84,26 +129,76 @@
   <div class="market" id="dax-etf">DAX-ETF<br>15.300€<br>+0.7%</div>
 </div>
 
-<!-- Footer: Verkehr + Radar -->
+<!-- Schlagzeilen -->
+<div class="news" id="news-container">
+  <div class="news-item">Nachrichten werden geladen...</div>
+</div>
+
+<!-- Footer: Weltuhren -->
 <div id="footer">
-  <div class="traffic-radar"></div>
-  <div id="traffic-time">🚗 Lade Verkehrszeit...</div>
+  <div class="world-clock">
+    <div class="analog-clock" id="clock-atlanta"><div class="hand" id="atlanta-hour"></div><div class="hand" id="atlanta-minute" style="height:1.5px;"></div></div>
+    <div>Atlanta</div>
+  </div>
+  <div class="world-clock">
+    <div class="analog-clock" id="clock-seoul"><div class="hand" id="seoul-hour"></div><div class="hand" id="seoul-minute" style="height:1.5px;"></div></div>
+    <div>Seoul</div>
+  </div>
+  <div class="world-clock">
+    <div class="analog-clock" id="clock-peking"><div class="hand" id="peking-hour"></div><div class="hand" id="peking-minute" style="height:1.5px;"></div></div>
+    <div>Peking</div>
+  </div>
+  <div class="world-clock">
+    <div class="analog-clock" id="clock-tokio"><div class="hand" id="tokio-hour"></div><div class="hand" id="tokio-minute" style="height:1.5px;"></div></div>
+    <div>Tokio</div>
+  </div>
 </div>
 
 <!-- Logo -->
 <div id="logo">NG</div>
 
 <script>
-/* ========== Verkehrszeit Workaround (keine API nötig) ========== */
-function updateTrafficFallback() {
-  // geschätzte Fahrtzeit mit leichter Variation
-  const min = 35 + Math.floor(Math.random()*5); // 35–40 min
-  document.getElementById("traffic-time").textContent = `🚗 ${min} Min von Albstadt nach Böblingen`;
+/* ========== Dummy Schlagzeilen ========== */
+const news = [
+  "Wichtige Nachricht 1",
+  "Top Story 2",
+  "Breaking News 3",
+  "Neuste Meldung 4",
+];
+const newsContainer = document.getElementById("news-container");
+newsContainer.innerHTML = "";
+news.forEach(n => {
+  const div = document.createElement("div");
+  div.className = "news-item";
+  div.textContent = n;
+  newsContainer.appendChild(div);
+});
+
+/* ========== Weltuhren ========== */
+function updateClock(hourId, minuteId, offset) {
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const cityTime = new Date(utc + (3600000 * offset));
+  const hours = cityTime.getHours() % 12;
+  const minutes = cityTime.getMinutes();
+
+  document.getElementById(hourId).style.transform = `rotate(${hours*30 + minutes*0.5}deg)`;
+  document.getElementById(minuteId).style.transform = `rotate(${minutes*6}deg)`;
 }
 
-// Sofort anzeigen und alle 5 Minuten aktualisieren
-updateTrafficFallback();
-setInterval(updateTrafficFallback, 5*60*1000);
+// Offset in Stunden von UTC
+const clocks = [
+  {h:'atlanta-hour', m:'atlanta-minute', offset:-5},
+  {h:'seoul-hour', m:'seoul-minute', offset:9},
+  {h:'peking-hour', m:'peking-minute', offset:8},
+  {h:'tokio-hour', m:'tokio-minute', offset:9},
+];
+
+function updateAllClocks() {
+  clocks.forEach(c => updateClock(c.h, c.m, c.offset));
+}
+updateAllClocks();
+setInterval(updateAllClocks, 1000);
 </script>
 
 </body>

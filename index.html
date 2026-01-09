@@ -14,7 +14,21 @@
     align-items: center;
   }
 
-  /* Hauptuhr oben */
+  /* Header */
+  #header {
+    font-size: 24px;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  /* Separator zwischen Sektionen */
+  .separator {
+    width: 80%;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    margin: 20px 0;
+  }
+
+  /* Hauptuhr */
   #main-clock {
     width: 120px;
     height: 120px;
@@ -38,18 +52,11 @@
     font-size: 16px;
   }
 
-  /* Header */
-  #header {
-    font-size: 24px;
-    text-align: center;
-  }
-
   /* Wetter nebeneinander */
   .weather-container {
     display: flex;
     justify-content: center;
     gap: 60px;
-    margin: 20px 0;
   }
   .weather { text-align:center; }
   .weather .city { font-size: 18px; margin-bottom: 5px; }
@@ -129,6 +136,8 @@
 </div>
 <div id="date"></div>
 
+<div class="separator"></div>
+
 <!-- Wetter -->
 <div class="weather-container">
   <div class="weather" id="weather-albstadt">
@@ -143,6 +152,8 @@
   </div>
 </div>
 
+<div class="separator"></div>
+
 <!-- Märkte -->
 <div class="markets">
   <div class="market" id="bitcoin">BTC<br>23.500€<br>+1.2%</div>
@@ -150,10 +161,14 @@
   <div class="market" id="dax-etf">DAX-ETF<br>15.300€<br>+0.7%</div>
 </div>
 
+<div class="separator"></div>
+
 <!-- Schlagzeilen -->
 <div class="news" id="news-container">
   <div class="news-item">Nachrichten werden geladen...</div>
 </div>
+
+<div class="separator"></div>
 
 <!-- Footer: Weltuhren -->
 <div id="footer">
@@ -187,28 +202,11 @@ function updateMainClock() {
   document.getElementById('main-hour').style.transform = `rotate(${hours*30 + minutes*0.5}deg)`;
   document.getElementById('main-minute').style.transform = `rotate(${minutes*6}deg)`;
 
-  // Datum
   const options = { weekday:'long', year:'numeric', month:'long', day:'numeric'};
   document.getElementById('date').textContent = now.toLocaleDateString('de-DE', options);
 }
 updateMainClock();
 setInterval(updateMainClock,1000);
-
-/* ===================== Schlagzeilen ===================== */
-const news = [
-  "Wichtige Nachricht 1",
-  "Top Story 2",
-  "Breaking News 3",
-  "Neuste Meldung 4",
-];
-const newsContainer = document.getElementById("news-container");
-newsContainer.innerHTML = "";
-news.forEach(n => {
-  const div = document.createElement("div");
-  div.className = "news-item";
-  div.textContent = n;
-  newsContainer.appendChild(div);
-});
 
 /* ===================== Weltuhren ===================== */
 function updateClock(hourId, minuteId, offset) {
@@ -229,6 +227,49 @@ const clocks = [
 function updateAllClocks() { clocks.forEach(c => updateClock(c.h,c.m,c.offset)); }
 updateAllClocks();
 setInterval(updateAllClocks,1000);
+
+/* ===================== Schlagzeilen mit Rückfallebenen ===================== */
+const NEWS_API_KEY = "230e953770ba4a2d8de64021a4976827"; // dein Key
+const newsContainer = document.getElementById("news-container");
+
+const fallbackNews = [
+  "Fallback Nachricht 1",
+  "Fallback Nachricht 2",
+  "Fallback Nachricht 3",
+];
+
+async function fetchNews() {
+  try {
+    const res = await fetch(`https://newsapi.org/v2/top-headlines?country=de&pageSize=5&apiKey=${NEWS_API_KEY}`);
+    const data = await res.json();
+    newsContainer.innerHTML = "";
+    if(data.articles && data.articles.length > 0){
+      data.articles.forEach(article => {
+        const div = document.createElement("div");
+        div.className = "news-item";
+        div.textContent = article.title;
+        newsContainer.appendChild(div);
+      });
+    } else {
+      fallbackNews.forEach(f => {
+        const div = document.createElement("div");
+        div.className = "news-item";
+        div.textContent = f;
+        newsContainer.appendChild(div);
+      });
+    }
+  } catch(err){
+    console.error(err);
+    fallbackNews.forEach(f => {
+      const div = document.createElement("div");
+      div.className = "news-item";
+      div.textContent = f;
+      newsContainer.appendChild(div);
+    });
+  }
+}
+fetchNews();
+setInterval(fetchNews, 5*60*1000);
 </script>
 
 </body>

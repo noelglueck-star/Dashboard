@@ -12,16 +12,12 @@ html, body {
   background: #000;
   color: #fff;
   font-family: Palatino, "Palatino Linotype", serif;
-  height: 100%;
 }
 
 .dashboard {
   max-width: 480px;
   margin: 0 auto;
   padding: 22px;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
 }
 
 .section {
@@ -35,14 +31,12 @@ html, body {
   margin: 12px 0;
 }
 
-/* Greeting */
 #greeting {
   text-align: center;
   font-size: 20px;
   letter-spacing: 1px;
 }
 
-/* Main Clock */
 .clock-wrapper {
   display: flex;
   justify-content: center;
@@ -65,7 +59,6 @@ html, body {
   opacity: 0.85;
 }
 
-/* Weather */
 .weather-row {
   display: flex;
   justify-content: center;
@@ -81,7 +74,6 @@ html, body {
 .weather-temp { font-size: 24px; margin: 5px 0; }
 .weather-icon { font-size: 24px; }
 
-/* Markets horizontal */
 .markets-list-horizontal {
   display: flex;
   justify-content: space-between;
@@ -103,7 +95,6 @@ html, body {
 .market-up { color: #4caf50; }
 .market-down { color: #e53935; }
 
-/* News */
 #news-list {
   display: flex;
   flex-direction: column;
@@ -125,7 +116,6 @@ html, body {
   transform: translateY(0);
 }
 
-/* World Clocks */
 .world-clocks {
   display: flex;
   justify-content: center;
@@ -154,7 +144,6 @@ html, body {
   opacity: 0.7;
 }
 
-/* Footer */
 .footer {
   display: flex;
   justify-content: center;
@@ -178,11 +167,9 @@ html, body {
 <body>
 <div class="dashboard">
 
-  <!-- Greeting -->
   <div id="greeting">Hallo Noel!</div>
   <div class="separator"></div>
 
-  <!-- Main Clock -->
   <div class="clock-wrapper">
     <div class="clock">
       <svg viewBox="0 0 100 100">
@@ -197,7 +184,6 @@ html, body {
 
   <div class="separator"></div>
 
-  <!-- Weather -->
   <div class="weather-row">
     <div class="weather-box" id="weather-albstadt"></div>
     <div class="weather-box" id="weather-boeblingen"></div>
@@ -205,19 +191,16 @@ html, body {
 
   <div class="separator"></div>
 
-  <!-- Markets -->
   <h3 style="text-align:center;">Märkte</h3>
   <div id="markets-list" class="markets-list-horizontal">Lade Marktdaten…</div>
 
   <div class="separator"></div>
 
-  <!-- News -->
   <h3 style="text-align:center;">Schlagzeilen</h3>
   <div id="news-list">Lade Nachrichten…</div>
 
   <div class="separator"></div>
 
-  <!-- World Clocks -->
   <div class="world-clocks">
     <div class="small-clock-container">
       <div class="small-clock">
@@ -268,17 +251,19 @@ html, body {
 </div>
 
 <script>
-/* Main Clock */
+/* Main Clock in Berlin-Zeit */
 function updateClock() {
   const now = new Date();
-  const h = now.getHours() % 12;
-  const m = now.getMinutes();
-  const s = now.getSeconds();
+  const options = { hour12: false, timeZone: 'Europe/Berlin' };
+  const h = parseInt(new Intl.DateTimeFormat('de-DE', { hour: '2-digit', ...options }).format(now));
+  const m = parseInt(new Intl.DateTimeFormat('de-DE', { minute: '2-digit', ...options }).format(now));
+  const s = parseInt(new Intl.DateTimeFormat('de-DE', { second: '2-digit', ...options }).format(now));
 
   document.getElementById("hour").setAttribute("transform", `rotate(${h*30 + m/2} 50 50)`);
   document.getElementById("minute").setAttribute("transform", `rotate(${m*6} 50 50)`);
   document.getElementById("second").setAttribute("transform", `rotate(${s*6} 50 50)`);
-  document.getElementById("date").innerText = now.toLocaleDateString("de-DE", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+
+  document.getElementById("date").innerText = now.toLocaleDateString("de-DE", { weekday:"long", day:"numeric", month:"long", year:"numeric", timeZone: 'Europe/Berlin' });
 
   updateWorldClock("atl-h","atl-m",-6);
   updateWorldClock("seo-h","seo-m",8);
@@ -313,7 +298,7 @@ async function loadWeather(lat, lon, el, city) {
 loadWeather(48.2167,9.0333,"weather-albstadt","Albstadt");
 loadWeather(48.6833,9.0167,"weather-boeblingen","Böblingen");
 
-/* Markets horizontal – Bitcoin, S&P 500, MSCI EAFE ETF */
+/* Markets horizontal */
 async function loadMarkets() {
   const container = document.getElementById("markets-list");
   try {
@@ -344,7 +329,7 @@ async function loadMarkets() {
 loadMarkets();
 setInterval(loadMarkets,5*60*1000);
 
-/* News with fallbacks (7 headlines) */
+/* News with fallbacks – 10 Headlines */
 async function fetchRSS(url) {
   try {
     const res = await fetch(url);
@@ -354,10 +339,10 @@ async function fetchRSS(url) {
     const xmlDoc = parser.parseFromString(text, "application/xml");
     const items = xmlDoc.querySelectorAll("item");
     const headlines = [];
-    for (let i = 0; i < Math.min(items.length, 7); i++) {
+    for (let i = 0; i < Math.min(items.length, 10); i++) {
       headlines.push(items[i].querySelector("title").textContent);
     }
-    return headlines;
+    return headlines.length>0 ? headlines : null;
   } catch (e) {
     return null;
   }
@@ -376,22 +361,22 @@ async function loadNews() {
   let headlines = null;
 
   for (let src of sources) {
-    if (src.includes("allorigins")) {
-      try {
+    try {
+      if (src.includes("allorigins")) {
         const res = await fetch(src);
         const json = await res.json();
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(json.contents, "application/xml");
         const items = xmlDoc.querySelectorAll("item");
         headlines = [];
-        for (let i = 0; i < Math.min(items.length, 7); i++) {
+        for (let i = 0; i < Math.min(items.length, 10); i++) {
           headlines.push(items[i].querySelector("title").textContent);
         }
-      } catch(e){ headlines = null; }
-    } else {
-      headlines = await fetchRSS(src);
-    }
-    if (headlines && headlines.length>0) break;
+      } else {
+        headlines = await fetchRSS(src);
+      }
+      if (headlines && headlines.length>0) break;
+    } catch(e){ headlines = null; }
   }
 
   if (headlines && headlines.length>0) {

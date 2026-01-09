@@ -17,18 +17,18 @@ html, body {
 .dashboard {
   max-width: 480px;
   margin: 0 auto;
-  padding: 24px; /* +10–15% */
+  padding: 24px; /* leicht größer */
 }
 
 .section {
-  margin-bottom: 22px; /* +10–15% */
+  margin-bottom: 22px; /* leicht größer */
   padding-bottom: 10px;
 }
 
 .separator {
   height: 1px;
   background: linear-gradient(to right, transparent, rgba(255,255,255,0.25), transparent);
-  margin: 14px 0; /* +10–15% */
+  margin: 14px 0; /* leicht größer */
 }
 
 /* Greeting */
@@ -77,7 +77,7 @@ html, body {
 .weather-temp { font-size: 24px; margin: 4px 0; }
 .weather-icon { font-size: 24px; }
 
-/* Markets horizontal */
+/* Markets */
 .markets-list-horizontal {
   display: flex;
   justify-content: space-between;
@@ -121,7 +121,7 @@ html, body {
   transform: translateY(0);
 }
 
-/* World Clocks */
+/* World clocks */
 .world-clocks {
   display: flex;
   justify-content: center;
@@ -154,7 +154,7 @@ html, body {
 .footer {
   display: flex;
   justify-content: center;
-  margin-top: 14px; /* +10–15% */
+  margin-top: 14px;
 }
 
 .logo {
@@ -172,4 +172,82 @@ html, body {
 </head>
 
 <body>
-<!-- JS & HTML INHALT UNVERÄNDERT -->
+<div class="dashboard">
+
+  <div id="greeting">Hallo Noel!</div>
+  <div class="separator"></div>
+
+  <div class="clock-wrapper">
+    <div class="clock">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
+        <line id="hour" x1="50" y1="50" x2="50" y2="30" stroke="white" stroke-width="2"/>
+        <line id="minute" x1="50" y1="50" x2="50" y2="20" stroke="white" stroke-width="1.5"/>
+        <line id="second" x1="50" y1="50" x2="50" y2="16" stroke="white" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+  <div id="date"></div>
+
+  <div class="separator"></div>
+
+  <div class="weather-row">
+    <div class="weather-box" id="weather-albstadt"></div>
+    <div class="weather-box" id="weather-boeblingen"></div>
+  </div>
+
+  <div class="separator"></div>
+
+  <h3 style="text-align:center;">Märkte</h3>
+  <div id="markets-list" class="markets-list-horizontal">Lade Marktdaten…</div>
+
+  <div class="separator"></div>
+
+  <h3 style="text-align:center;">Schlagzeilen</h3>
+  <div id="news-list">Lade Nachrichten…</div>
+
+  <div class="separator"></div>
+
+  <div class="world-clocks">
+    <div class="small-clock-container"><div class="small-clock"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="white" fill="none"/><line id="atl-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/><line id="atl-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/></svg></div><div class="clock-label">ATL</div></div>
+    <div class="small-clock-container"><div class="small-clock"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="white" fill="none"/><line id="seo-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/><line id="seo-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/></svg></div><div class="clock-label">SEL</div></div>
+    <div class="small-clock-container"><div class="small-clock"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="white" fill="none"/><line id="bei-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/><line id="bei-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/></svg></div><div class="clock-label">PEK</div></div>
+    <div class="small-clock-container"><div class="small-clock"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="white" fill="none"/><line id="tok-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/><line id="tok-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/></svg></div><div class="clock-label">TYO</div></div>
+  </div>
+
+  <div class="footer">
+    <div class="logo">NG</div>
+  </div>
+
+</div>
+
+<script>
+/* Main + World Clocks */
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours() % 12;
+  const m = now.getMinutes();
+  const s = now.getSeconds();
+
+  hour.setAttribute("transform", `rotate(${h*30 + m/2} 50 50)`);
+  minute.setAttribute("transform", `rotate(${m*6} 50 50)`);
+  second.setAttribute("transform", `rotate(${s*6} 50 50)`);
+
+  date.innerText = now.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+
+  world("atl-h","atl-m",-6);
+  world("seo-h","seo-m",8);
+  world("bei-h","bei-m",7);
+  world("tok-h","tok-m",8);
+}
+function world(h,m,o){
+  const d=new Date(); d.setHours(d.getHours()+o);
+  h=document.getElementById(h); m=document.getElementById(m);
+  h.setAttribute("transform",`rotate(${(d.getHours()%12)*30+d.getMinutes()/2} 50 50)`);
+  m.setAttribute("transform",`rotate(${d.getMinutes()*6} 50 50)`);
+}
+setInterval(updateClock,1000); updateClock();
+</script>
+
+</body>
+</html>

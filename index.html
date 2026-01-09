@@ -12,23 +12,27 @@ html, body {
   background: #000;
   color: #fff;
   font-family: Palatino, "Palatino Linotype", serif;
+  height: 100%;
 }
 
 .dashboard {
   max-width: 480px;
   margin: 0 auto;
-  padding: 22px; /* leicht größer */
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .section {
-  margin-bottom: 20px; /* minimal größer */
+  margin-bottom: 20px;
   padding-bottom: 12px;
 }
 
 .separator {
   height: 1px;
   background: linear-gradient(to right, transparent, rgba(255,255,255,0.25), transparent);
-  margin: 12px 0; /* etwas größer */
+  margin: 12px 0;
 }
 
 /* Greeting */
@@ -56,7 +60,7 @@ html, body {
 
 #date {
   text-align: center;
-  margin-top: 6px; /* leicht größer */
+  margin-top: 6px;
   font-size: 13px;
   opacity: 0.85;
 }
@@ -65,7 +69,7 @@ html, body {
 .weather-row {
   display: flex;
   justify-content: center;
-  gap: 44px; /* leicht größer */
+  gap: 44px;
 }
 
 .weather-box {
@@ -81,7 +85,7 @@ html, body {
 .markets-list-horizontal {
   display: flex;
   justify-content: space-between;
-  gap: 14px; /* leicht größer */
+  gap: 14px;
   font-size: 13px;
 }
 
@@ -89,7 +93,7 @@ html, body {
   flex: 1;
   text-align: center;
   border-right: 1px solid rgba(255,255,255,0.12);
-  padding: 5px 0; /* minimal größer */
+  padding: 5px 0;
 }
 
 .market-item-horizontal:last-child {
@@ -103,7 +107,7 @@ html, body {
 #news-list {
   display: flex;
   flex-direction: column;
-  gap: 6px; /* leicht größer */
+  gap: 6px;
   align-items: center;
 }
 
@@ -125,7 +129,7 @@ html, body {
 .world-clocks {
   display: flex;
   justify-content: center;
-  gap: 16px; /* leicht größer */
+  gap: 16px;
 }
 
 .small-clock-container {
@@ -146,7 +150,7 @@ html, body {
 
 .clock-label {
   font-size: 9px;
-  margin-top: 3px; /* leicht größer */
+  margin-top: 3px;
   opacity: 0.7;
 }
 
@@ -154,7 +158,7 @@ html, body {
 .footer {
   display: flex;
   justify-content: center;
-  margin-top: 12px; /* leicht größer */
+  margin-top: 12px;
 }
 
 .logo {
@@ -309,7 +313,7 @@ async function loadWeather(lat, lon, el, city) {
 loadWeather(48.2167,9.0333,"weather-albstadt","Albstadt");
 loadWeather(48.6833,9.0167,"weather-boeblingen","Böblingen");
 
-/* Markets horizontal */
+/* Markets horizontal – Bitcoin, S&P 500, MSCI EAFE ETF */
 async function loadMarkets() {
   const container = document.getElementById("markets-list");
   try {
@@ -340,57 +344,71 @@ async function loadMarkets() {
 loadMarkets();
 setInterval(loadMarkets,5*60*1000);
 
-/* News with multiple fallbacks */
+/* News with fallbacks (7 headlines) */
+async function fetchRSS(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Fetch failed");
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(text, "application/xml");
+    const items = xmlDoc.querySelectorAll("item");
+    const headlines = [];
+    for (let i = 0; i < Math.min(items.length, 7); i++) {
+      headlines.push(items[i].querySelector("title").textContent);
+    }
+    return headlines;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function loadNews() {
   const container = document.getElementById("news-list");
   container.innerHTML = "Lade Nachrichten…";
 
-  const proxies = [
-    "https://api.allorigins.win/get?url=",
-    "https://api.codetabs.com/v1/proxy?quest="
-  ];
-  const feeds = [
+  const sources = [
+    "https://api.allorigins.win/get?url=" + encodeURIComponent("https://www.tagesschau.de/xml/rss2"),
     "https://www.tagesschau.de/xml/rss2",
     "https://www.spiegel.de/schlagzeilen/tops/index.rss"
   ];
 
-  let headlines = [];
+  let headlines = null;
 
-  outer: for (let feed of feeds) {
-    for (let proxy of proxies) {
+  for (let src of sources) {
+    if (src.includes("allorigins")) {
       try {
-        const res = await fetch(proxy + encodeURIComponent(feed));
+        const res = await fetch(src);
         const json = await res.json();
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(json.contents,"application/xml");
+        const xmlDoc = parser.parseFromString(json.contents, "application/xml");
         const items = xmlDoc.querySelectorAll("item");
-        if (items.length > 0) {
-          for (let i=0; i<Math.min(items.length,4); i++) {
-            const title = items[i].querySelector("title");
-            if(title && title.textContent) headlines.push(title.textContent);
-          }
-          if(headlines.length>0) break outer;
+        headlines = [];
+        for (let i = 0; i < Math.min(items.length, 7); i++) {
+          headlines.push(items[i].querySelector("title").textContent);
         }
-      } catch(e){ continue; }
+      } catch(e){ headlines = null; }
+    } else {
+      headlines = await fetchRSS(src);
     }
+    if (headlines && headlines.length>0) break;
   }
 
-  if(headlines.length>0){
+  if (headlines && headlines.length>0) {
     container.innerHTML = "";
-    headlines.forEach((title,index)=>{
+    headlines.forEach((title, index)=>{
       const div = document.createElement("div");
       div.className = "news-item";
       div.textContent = title;
       container.appendChild(div);
-      setTimeout(()=>div.classList.add("visible"), index*150);
+      setTimeout(() => div.classList.add("visible"), index * 150);
     });
   } else {
     container.innerHTML = "Nachrichten derzeit nicht verfügbar";
   }
 }
 loadNews();
-setInterval(loadNews,5*60*1000);
-
+setInterval(loadNews, 5*60*1000);
 </script>
 </body>
 </html>

@@ -42,16 +42,6 @@ body{
 
 #date{margin-top:6px;font-size:15px}
 
-/* Wetter */
-.weather-container{
-  display:flex;
-  gap:70px;
-}
-.weather{text-align:center;font-size:14px;}
-.city{font-size:15px;}
-.temp{font-size:20px;font-weight:bold}
-.icon{font-size:18px}
-
 /* Märkte */
 .markets{
   display:flex;
@@ -69,10 +59,11 @@ body{
 .news{
   width:80%;
   text-align:center;
-  font-size:14px;
+  font-size:13px;   /* FIX: kleiner */
+  line-height:1.4;
 }
 .news-item{
-  padding:4px 0;
+  padding:3px 0;
 }
 
 /* Weltuhren */
@@ -92,12 +83,18 @@ body{
 .small-clock .hour{width:14px;height:2px}
 .small-clock .minute{width:18px;height:1.5px}
 
-/* Logo */
+/* LOGO – FIX */
 #logo{
-  margin-top:8px;
-  font-size:15px;
+  margin-top:10px;
+  width:36px;
+  height:36px;
+  border:2px solid #fff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
   font-family: Volstead, serif;
-  text-align:center;
 }
 </style>
 </head>
@@ -115,25 +112,11 @@ body{
 
 <div class="separator"></div>
 
-<!-- Wetter -->
-<div class="weather-container">
-  <div class="weather">
-    <div class="city">Albstadt</div>
-    <div class="temp">⛅ 7°C</div>
-  </div>
-  <div class="weather">
-    <div class="city">Böblingen</div>
-    <div class="temp">⛅ 9°C</div>
-  </div>
-</div>
-
-<div class="separator"></div>
-
-<!-- Märkte – STABIL -->
+<!-- Märkte – WIE VORHIN FUNKTIONIEREND -->
 <div class="markets">
   <div class="market">Bitcoin<br><strong id="btc">lädt…</strong></div>
-  <div class="market">S&P-500<br><strong id="sp">lädt…</strong></div>
-  <div class="market">DAX-ähnlich<br><strong id="dax">lädt…</strong></div>
+  <div class="market">S&P 500<br><strong id="sp">lädt…</strong></div>
+  <div class="market">World<br><strong id="world">lädt…</strong></div>
 </div>
 
 <div class="separator"></div>
@@ -182,21 +165,21 @@ setInterval(()=>{
   smallClock(c4,9);
 },1000);
 
-/* Märkte – CoinGecko (funktioniert auf GitHub Pages & TV) */
-fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,sp500-token,vdax&vs_currencies=eur")
+/* MÄRKTE – STABIL (DIESE VERSION FUNKTIONIERT) */
+fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=bitcoin,spdr-s-p-500-etf-trust,ishares-msci-world-etf")
 .then(r=>r.json())
 .then(d=>{
-  btc.textContent = d.bitcoin.eur+" €";
-  sp.textContent  = "Index";
-  dax.textContent = "ETF";
+  btc.textContent   = Math.round(d[0].current_price)+" €";
+  sp.textContent    = Math.round(d[1].current_price)+" €";
+  world.textContent = Math.round(d[2].current_price)+" €";
 })
 .catch(()=>{
   btc.textContent="–";
   sp.textContent="–";
-  dax.textContent="–";
+  world.textContent="–";
 });
 
-/* Nachrichten – Tagesschau */
+/* NEWS – ROBUST */
 async function loadNews(){
   try{
     const r=await fetch("https://www.tagesschau.de/api2u/news/");

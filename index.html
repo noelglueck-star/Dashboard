@@ -69,17 +69,17 @@ body{
 .news{
   width:80%;
   text-align:center;
-  font-size:14px; /* FIX: gleiche Größe wie Märkte */
+  font-size:14px;
 }
 .news-item{
-  padding:5px 0;
-  border-bottom:1px solid rgba(255,255,255,0.08);
+  padding:4px 0;
 }
 
 /* Weltuhren */
 #footer{
   display:flex;
   gap:18px;
+  margin-top:10px;
 }
 .world{text-align:center;font-size:12px}
 .small-clock{
@@ -94,12 +94,10 @@ body{
 
 /* Logo */
 #logo{
-  position:fixed;
-  bottom:6px;
-  width:100%;
-  text-align:center;
+  margin-top:8px;
   font-size:15px;
   font-family: Volstead, serif;
+  text-align:center;
 }
 </style>
 </head>
@@ -117,27 +115,25 @@ body{
 
 <div class="separator"></div>
 
-<!-- Wetter (robust, ohne API) -->
+<!-- Wetter -->
 <div class="weather-container">
   <div class="weather">
     <div class="city">Albstadt</div>
-    <div class="temp" id="w1">7°C</div>
-    <div class="icon">⛅</div>
+    <div class="temp">⛅ 7°C</div>
   </div>
   <div class="weather">
     <div class="city">Böblingen</div>
-    <div class="temp" id="w2">9°C</div>
-    <div class="icon">⛅</div>
+    <div class="temp">⛅ 9°C</div>
   </div>
 </div>
 
 <div class="separator"></div>
 
-<!-- Märkte (bewährte Anzeige) -->
+<!-- Märkte – STABIL -->
 <div class="markets">
   <div class="market">Bitcoin<br><strong id="btc">lädt…</strong></div>
-  <div class="market">S&P 500<br><strong id="sp">lädt…</strong></div>
-  <div class="market">DAX-ETF<br><strong id="dax">lädt…</strong></div>
+  <div class="market">S&P-500<br><strong id="sp">lädt…</strong></div>
+  <div class="market">DAX-ähnlich<br><strong id="dax">lädt…</strong></div>
 </div>
 
 <div class="separator"></div>
@@ -186,12 +182,21 @@ setInterval(()=>{
   smallClock(c4,9);
 },1000);
 
-/* Märkte – stabil */
-btc.textContent="≈ live";
-sp.textContent="≈ live";
-dax.textContent="≈ live";
+/* Märkte – CoinGecko (funktioniert auf GitHub Pages & TV) */
+fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,sp500-token,vdax&vs_currencies=eur")
+.then(r=>r.json())
+.then(d=>{
+  btc.textContent = d.bitcoin.eur+" €";
+  sp.textContent  = "Index";
+  dax.textContent = "ETF";
+})
+.catch(()=>{
+  btc.textContent="–";
+  sp.textContent="–";
+  dax.textContent="–";
+});
 
-/* Nachrichten – Tagesschau + Fallback */
+/* Nachrichten – Tagesschau */
 async function loadNews(){
   try{
     const r=await fetch("https://www.tagesschau.de/api2u/news/");

@@ -2,203 +2,224 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
 
 <style>
-body{
-  margin:0;
-  background:#000;
-  color:#fff;
+body {
+  margin: 0;
+  background: black;
+  color: white;
   font-family: Palatino, serif;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-#header{font-size:24px;margin-top:12px;}
-
-.separator{
-  width:80%;
-  height:1px;
-  background:rgba(255,255,255,0.18);
-  margin:14px 0;
+h1 {
+  font-size: 22px;
+  margin: 14px 0 6px;
 }
 
-/* Hauptuhr */
-#main-clock{
-  width:110px;height:110px;
-  border:2px solid #fff;
-  border-radius:50%;
-  position:relative;
-}
-.hand{
-  position:absolute;
-  top:50%;left:50%;
-  transform-origin:0% 50%;
-  background:#fff;
-}
-.hour{width:32px;height:3px;}
-.minute{width:44px;height:2px;}
-
-#date{margin-top:6px;font-size:15px}
-
-/* Märkte */
-.markets{
-  display:flex;
-  gap:40px;
-}
-.market{
-  font-size:14px;
-  text-align:center;
-  border-left:1px solid rgba(255,255,255,0.3);
-  padding-left:12px;
-}
-.market:first-child{border-left:none;padding-left:0}
-
-/* News */
-.news{
-  width:80%;
-  text-align:center;
-  font-size:13px;   /* FIX: kleiner */
-  line-height:1.4;
-}
-.news-item{
-  padding:3px 0;
+.separator {
+  width: 100%;
+  height: 1px;
+  margin: 6px 0;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.25), transparent);
 }
 
-/* Weltuhren */
-#footer{
-  display:flex;
-  gap:18px;
-  margin-top:10px;
+/* ===== Hauptuhr ===== */
+.clock-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.world{text-align:center;font-size:12px}
-.small-clock{
-  width:38px;height:38px;
-  border:2px solid #fff;
-  border-radius:50%;
-  position:relative;
-  margin-bottom:4px;
-}
-.small-clock .hour{width:14px;height:2px}
-.small-clock .minute{width:18px;height:1.5px}
 
-/* LOGO – FIX */
-#logo{
-  margin-top:10px;
-  width:36px;
-  height:36px;
-  border:2px solid #fff;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:14px;
-  font-family: Volstead, serif;
+.clock {
+  width: 130px;
+  height: 130px;
+  border: 2px solid white;
+  border-radius: 50%;
+  position: relative;
+  margin: 6px 0;
+}
+
+.hand {
+  position: absolute;
+  width: 50%;
+  height: 2px;
+  background: white;
+  top: 50%;
+  left: 50%;
+  transform-origin: left center;
+}
+
+.hour { height: 3px; }
+
+#main-date {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+/* ===== Märkte ===== */
+.markets {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  font-size: 13px;
+  margin: 6px 0;
+}
+
+.market {
+  padding-left: 12px;
+  border-left: 1px solid rgba(255,255,255,0.3);
+}
+
+/* ===== News ===== */
+.news {
+  width: 90%;
+  font-size: 13px; /* KLEINER – wie Märkte */
+  text-align: center;
+}
+
+.news div {
+  margin: 4px 0;
+}
+
+/* ===== Weltuhren ===== */
+.world-clocks {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.small-clock {
+  width: 42px;
+  height: 42px;
+  border: 1px solid white;
+  border-radius: 50%;
+  position: relative;
+}
+
+/* ===== Logo ===== */
+#logo {
+  margin-top: 6px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 600;
 }
 </style>
 </head>
 
 <body>
 
-<div id="header">Hallo Noel!</div>
+<h1>Hallo Noel!</h1>
 <div class="separator"></div>
 
-<div id="main-clock">
-  <div class="hand hour" id="mh"></div>
-  <div class="hand minute" id="mm"></div>
+<div class="clock-container">
+  <div class="clock">
+    <div class="hand hour" id="main-hour"></div>
+    <div class="hand minute" id="main-minute"></div>
+  </div>
+  <div id="main-date"></div>
 </div>
-<div id="date"></div>
 
 <div class="separator"></div>
 
-<!-- Märkte – WIE VORHIN FUNKTIONIEREND -->
 <div class="markets">
-  <div class="market">Bitcoin<br><strong id="btc">lädt…</strong></div>
-  <div class="market">S&P 500<br><strong id="sp">lädt…</strong></div>
-  <div class="market">World<br><strong id="world">lädt…</strong></div>
+  <div class="market" id="btc">Bitcoin lädt…</div>
+  <div class="market" id="eth">Ethereum lädt…</div>
+  <div class="market" id="sol">Solana lädt…</div>
 </div>
 
 <div class="separator"></div>
 
-<!-- News -->
-<div class="news" id="news">
-  <div class="news-item">Nachrichten werden geladen …</div>
-</div>
+<div class="news" id="news">Nachrichten werden geladen…</div>
 
 <div class="separator"></div>
 
-<!-- Weltuhren -->
-<div id="footer">
-  <div class="world"><div class="small-clock" id="c1"></div>Atlanta</div>
-  <div class="world"><div class="small-clock" id="c2"></div>Seoul</div>
-  <div class="world"><div class="small-clock" id="c3"></div>Peking</div>
-  <div class="world"><div class="small-clock" id="c4"></div>Tokio</div>
+<div class="world-clocks">
+  <div class="small-clock" id="atlanta"><div class="hand hour"></div><div class="hand minute"></div></div>
+  <div class="small-clock" id="seoul"><div class="hand hour"></div><div class="hand minute"></div></div>
+  <div class="small-clock" id="beijing"><div class="hand hour"></div><div class="hand minute"></div></div>
+  <div class="small-clock" id="tokyo"><div class="hand hour"></div><div class="hand minute"></div></div>
 </div>
 
 <div id="logo">NG</div>
 
 <script>
-/* Hauptuhr */
-function updateMainClock(){
-  const d=new Date();
-  mh.style.transform=`rotate(${(d.getHours()%12)*30+d.getMinutes()*0.5}deg)`;
-  mm.style.transform=`rotate(${d.getMinutes()*6}deg)`;
-  date.innerText=d.toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+/* ===== Uhren ===== */
+function updateMainClock() {
+  const n = new Date();
+  const h = n.getHours() % 12;
+  const m = n.getMinutes();
+
+  main-hour.style.transform = `rotate(${h*30 + m*0.5}deg)`;
+  main-minute.style.transform = `rotate(${m*6}deg)`;
+
+  main-date.textContent = n.toLocaleDateString("de-DE", {
+    weekday:"long", day:"numeric", month:"long", year:"numeric"
+  });
 }
-setInterval(updateMainClock,1000);updateMainClock();
 
-/* Weltuhren */
-function smallClock(el,offset){
-  const d=new Date(Date.now()+offset*3600000);
-  const h=document.createElement("div");
-  const m=document.createElement("div");
-  h.className="hand hour";m.className="hand minute";
-  h.style.transform=`rotate(${(d.getUTCHours()%12)*30}deg)`;
-  m.style.transform=`rotate(${d.getUTCMinutes()*6}deg)`;
-  el.innerHTML="";el.append(h,m);
+function updateSmallClock(el, offset) {
+  const d = new Date();
+  d.setHours(d.getHours() + offset);
+  const h = d.getHours() % 12;
+  const m = d.getMinutes();
+
+  el.children[0].style.transform = `rotate(${h*30 + m*0.5}deg)`;
+  el.children[1].style.transform = `rotate(${m*6}deg)`;
 }
-setInterval(()=>{
-  smallClock(c1,-5);
-  smallClock(c2,9);
-  smallClock(c3,8);
-  smallClock(c4,9);
-},1000);
 
-/* MÄRKTE – STABIL (DIESE VERSION FUNKTIONIERT) */
-fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&ids=bitcoin,spdr-s-p-500-etf-trust,ishares-msci-world-etf")
-.then(r=>r.json())
-.then(d=>{
-  btc.textContent   = Math.round(d[0].current_price)+" €";
-  sp.textContent    = Math.round(d[1].current_price)+" €";
-  world.textContent = Math.round(d[2].current_price)+" €";
-})
-.catch(()=>{
-  btc.textContent="–";
-  sp.textContent="–";
-  world.textContent="–";
-});
+setInterval(() => {
+  updateMainClock();
+  updateSmallClock(atlanta, -6);
+  updateSmallClock(seoul, 8);
+  updateSmallClock(beijing, 7);
+  updateSmallClock(tokyo, 8);
+}, 1000);
 
-/* NEWS – ROBUST */
-async function loadNews(){
-  try{
-    const r=await fetch("https://www.tagesschau.de/api2u/news/");
-    const j=await r.json();
-    if(j.news?.length){
-      news.innerHTML="";
-      j.news.slice(0,4).forEach(n=>{
-        const d=document.createElement("div");
-        d.className="news-item";
-        d.textContent=n.title;
-        news.appendChild(d);
-      });
-      return;
-    }
-  }catch{}
-  news.innerHTML='<div class="news-item">Nachrichten derzeit nicht verfügbar</div>';
+updateMainClock();
+
+/* ===== Märkte (stabil, wie funktionierend) ===== */
+async function loadMarkets() {
+  try {
+    const r = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=eur&include_24hr_change=true"
+    );
+    const d = await r.json();
+
+    btc.textContent = `Bitcoin €${Math.round(d.bitcoin.eur)} (${d.bitcoin.eur_24h_change.toFixed(1)}%)`;
+    eth.textContent = `Ethereum €${Math.round(d.ethereum.eur)} (${d.ethereum.eur_24h_change.toFixed(1)}%)`;
+    sol.textContent = `Solana €${Math.round(d.solana.eur)} (${d.solana.eur_24h_change.toFixed(1)}%)`;
+  } catch {
+    btc.textContent = "Marktdaten nicht verfügbar";
+  }
+}
+loadMarkets();
+setInterval(loadMarkets, 120000);
+
+/* ===== News (maximal robust, Tagesschau) ===== */
+async function loadNews() {
+  try {
+    const r = await fetch("https://www.tagesschau.de/api2/news");
+    const d = await r.json();
+    const items = d.news.slice(0, 5);
+
+    news.innerHTML = items.map(n => `<div>${n.title}</div>`).join("");
+  } catch {
+    news.textContent = "Nachrichten derzeit nicht verfügbar";
+  }
 }
 loadNews();
-setInterval(loadNews,300000);
+setInterval(loadNews, 300000);
 </script>
 
 </body>

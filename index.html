@@ -77,19 +77,23 @@ html, body {
 .weather-temp { font-size: 24px; margin: 4px 0; }
 .weather-icon { font-size: 24px; }
 
-/* Markets */
-.markets-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.market-item {
+/* Markets horizontal */
+.markets-list-horizontal {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
-  padding-bottom: 3px;
+  gap: 12px;
   font-size: 13px;
+}
+
+.market-item-horizontal {
+  flex: 1;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.12);
+  padding: 4px 0;
+}
+
+.market-item-horizontal:last-child {
+  border-right: none;
 }
 
 .market-up { color: #4caf50; }
@@ -199,7 +203,7 @@ html, body {
 
   <!-- Markets -->
   <h3>Märkte</h3>
-  <div id="markets-list" class="markets-list">Lade Marktdaten…</div>
+  <div id="markets-list" class="markets-list-horizontal">Lade Marktdaten…</div>
 
   <div class="separator"></div>
 
@@ -305,22 +309,28 @@ async function loadWeather(lat, lon, el, city) {
 loadWeather(48.2167,9.0333,"weather-albstadt","Albstadt");
 loadWeather(48.6833,9.0167,"weather-boeblingen","Böblingen");
 
-/* Markets */
+/* Markets horizontal */
 async function loadMarkets() {
   const container = document.getElementById("markets-list");
   try {
     const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur&include_24hr_change=true");
     const d = await res.json();
     container.innerHTML = "";
+
     const markets = [
       { name: "Bitcoin", price: d.bitcoin.eur, change: d.bitcoin.eur_24h_change },
       { name: "DAX (Proxy)", price: 15800, change: 0.45 },
       { name: "S&P 500 (Proxy)", price: 4200, change: -0.21 }
     ];
+
     markets.forEach(m=>{
       const cls = m.change>=0 ? "market-up" : "market-down";
-      container.innerHTML += `<div class="market-item"><div>${m.name}</div><div class="${cls}">€${m.price.toLocaleString("de-DE")}<br>${m.change.toFixed(2)} %</div></div>`;
+      const div = document.createElement("div");
+      div.className = "market-item-horizontal";
+      div.innerHTML = `<div>${m.name}</div><div class="${cls}">€${m.price.toLocaleString("de-DE")}<br>${m.change.toFixed(2)} %</div>`;
+      container.appendChild(div);
     });
+
   } catch(e){
     container.innerHTML = "Marktdaten nicht verfügbar";
   }
@@ -328,7 +338,7 @@ async function loadMarkets() {
 loadMarkets();
 setInterval(loadMarkets,5*60*1000);
 
-/* News */
+/* News with fallbacks */
 async function fetchRSS(url) {
   try {
     const res = await fetch(url);
@@ -394,7 +404,7 @@ async function loadNews() {
 }
 loadNews();
 setInterval(loadNews, 5*60*1000);
-</script>
 
+</script>
 </body>
 </html>

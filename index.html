@@ -105,7 +105,7 @@ html, body {
 
 .news-item {
   text-align: center;
-  font-size: 12.5px;
+  font-size: 13px;
   padding: 3px 0;
   opacity: 0;
   transform: translateY(6px);
@@ -124,6 +124,12 @@ html, body {
   gap: 14px;
 }
 
+.small-clock-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .small-clock {
   width: 44px;
   height: 44px;
@@ -132,6 +138,12 @@ html, body {
 .small-clock svg {
   width: 100%;
   height: 100%;
+}
+
+.clock-label {
+  font-size: 9px;
+  margin-top: 2px;
+  opacity: 0.7;
 }
 
 /* Footer */
@@ -158,6 +170,7 @@ html, body {
 <body>
 <div class="dashboard">
 
+  <!-- Greeting -->
   <div id="greeting">Hallo Noel!</div>
   <div class="separator"></div>
 
@@ -198,40 +211,45 @@ html, body {
 
   <!-- World Clocks -->
   <div class="world-clocks">
-    <!-- Atlanta -->
-    <div class="small-clock">
-      <svg viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
-        <line id="atl-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/>
-        <line id="atl-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/>
-      </svg>
+    <div class="small-clock-container">
+      <div class="small-clock">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
+          <line id="atl-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/>
+          <line id="atl-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="clock-label">ATL</div>
     </div>
-
-    <!-- Seoul -->
-    <div class="small-clock">
-      <svg viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
-        <line id="seo-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/>
-        <line id="seo-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/>
-      </svg>
+    <div class="small-clock-container">
+      <div class="small-clock">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
+          <line id="seo-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/>
+          <line id="seo-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="clock-label">SEL</div>
     </div>
-
-    <!-- Beijing -->
-    <div class="small-clock">
-      <svg viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
-        <line id="bei-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/>
-        <line id="bei-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/>
-      </svg>
+    <div class="small-clock-container">
+      <div class="small-clock">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
+          <line id="bei-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/>
+          <line id="bei-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="clock-label">PEK</div>
     </div>
-
-    <!-- Tokyo -->
-    <div class="small-clock">
-      <svg viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
-        <line id="tok-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/>
-        <line id="tok-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/>
-      </svg>
+    <div class="small-clock-container">
+      <div class="small-clock">
+        <svg viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="48" stroke="white" stroke-width="1" fill="none"/>
+          <line id="tok-h" x1="50" y1="50" x2="50" y2="32" stroke="white" stroke-width="2"/>
+          <line id="tok-m" x1="50" y1="50" x2="50" y2="22" stroke="white" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="clock-label">TYO</div>
     </div>
   </div>
 
@@ -249,13 +267,10 @@ function updateClock() {
   const m = now.getMinutes();
   const s = now.getSeconds();
 
-  hour.setAttribute("transform", `rotate(${h*30 + m/2} 50 50)`);
-  minute.setAttribute("transform", `rotate(${m*6} 50 50)`);
-  second.setAttribute("transform", `rotate(${s*6} 50 50)`);
-
-  date.innerText = now.toLocaleDateString("de-DE", {
-    weekday:"long", day:"numeric", month:"long", year:"numeric"
-  });
+  document.getElementById("hour").setAttribute("transform", `rotate(${h*30 + m/2} 50 50)`);
+  document.getElementById("minute").setAttribute("transform", `rotate(${m*6} 50 50)`);
+  document.getElementById("second").setAttribute("transform", `rotate(${s*6} 50 50)`);
+  document.getElementById("date").innerText = now.toLocaleDateString("de-DE", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
 
   updateWorldClock("atl-h","atl-m",-6);
   updateWorldClock("seo-h","seo-m",8);
@@ -274,10 +289,7 @@ function updateWorldClock(hId,mId,offset){
 
 setInterval(updateClock,1000);
 updateClock();
-</script>
 
-<!-- Weather, Markets & News bleiben UNVERÄNDERT aus deiner funktionalen Version -->
-<script>
 /* Weather */
 async function loadWeather(lat, lon, el, city) {
   try {
@@ -285,18 +297,104 @@ async function loadWeather(lat, lon, el, city) {
     const data = await res.json();
     const w = data.current_weather;
     const icon = w.weathercode < 3 ? "☀️" : w.weathercode < 50 ? "☁️" : "🌧️";
-    document.getElementById(el).innerHTML = `
-      <div class="weather-city">${city}</div>
-      <div class="weather-temp">${Math.round(w.temperature)}°C</div>
-      <div class="weather-icon">${icon}</div>`;
+    document.getElementById(el).innerHTML = `<div class="weather-city">${city}</div><div class="weather-temp">${Math.round(w.temperature)}°C</div><div class="weather-icon">${icon}</div>`;
   } catch {
     document.getElementById(el).innerHTML = "Wetter nicht verfügbar";
   }
 }
 loadWeather(48.2167,9.0333,"weather-albstadt","Albstadt");
 loadWeather(48.6833,9.0167,"weather-boeblingen","Böblingen");
+
+/* Markets */
+async function loadMarkets() {
+  const container = document.getElementById("markets-list");
+  try {
+    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur&include_24hr_change=true");
+    const d = await res.json();
+    container.innerHTML = "";
+    const markets = [
+      { name: "Bitcoin", price: d.bitcoin.eur, change: d.bitcoin.eur_24h_change },
+      { name: "DAX (Proxy)", price: 15800, change: 0.45 },
+      { name: "S&P 500 (Proxy)", price: 4200, change: -0.21 }
+    ];
+    markets.forEach(m=>{
+      const cls = m.change>=0 ? "market-up" : "market-down";
+      container.innerHTML += `<div class="market-item"><div>${m.name}</div><div class="${cls}">€${m.price.toLocaleString("de-DE")}<br>${m.change.toFixed(2)} %</div></div>`;
+    });
+  } catch(e){
+    container.innerHTML = "Marktdaten nicht verfügbar";
+  }
+}
+loadMarkets();
+setInterval(loadMarkets,5*60*1000);
+
+/* News */
+async function fetchRSS(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Fetch failed");
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(text, "application/xml");
+    const items = xmlDoc.querySelectorAll("item");
+    const headlines = [];
+    for (let i = 0; i < Math.min(items.length, 4); i++) {
+      headlines.push(items[i].querySelector("title").textContent);
+    }
+    if (headlines.length === 0) throw new Error("No headlines");
+    return headlines;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function loadNews() {
+  const container = document.getElementById("news-list");
+  container.innerHTML = "Lade Nachrichten…";
+
+  const sources = [
+    "https://api.allorigins.win/get?url=" + encodeURIComponent("https://www.tagesschau.de/xml/rss2"),
+    "https://www.tagesschau.de/xml/rss2",
+    "https://www.spiegel.de/schlagzeilen/tops/index.rss"
+  ];
+
+  let headlines = null;
+
+  for (let src of sources) {
+    if (src.includes("allorigins")) {
+      try {
+        const res = await fetch(src);
+        const json = await res.json();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(json.contents, "application/xml");
+        const items = xmlDoc.querySelectorAll("item");
+        headlines = [];
+        for (let i = 0; i < Math.min(items.length, 4); i++) {
+          headlines.push(items[i].querySelector("title").textContent);
+        }
+      } catch(e){ headlines = null; }
+    } else {
+      headlines = await fetchRSS(src);
+    }
+    if (headlines && headlines.length>0) break;
+  }
+
+  if (headlines && headlines.length>0) {
+    container.innerHTML = "";
+    headlines.forEach((title, index)=>{
+      const div = document.createElement("div");
+      div.className = "news-item";
+      div.textContent = title;
+      container.appendChild(div);
+      setTimeout(() => div.classList.add("visible"), index * 150);
+    });
+  } else {
+    container.innerHTML = "Nachrichten derzeit nicht verfügbar";
+  }
+}
+loadNews();
+setInterval(loadNews, 5*60*1000);
 </script>
 
-<!-- Markets + News bleiben exakt wie bei dir -->
 </body>
 </html>

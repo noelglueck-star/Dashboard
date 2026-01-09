@@ -6,113 +6,103 @@
 <title>Dashboard</title>
 
 <style>
-body {
-  margin: 0;
-  background: black;
-  color: white;
-  font-family: Palatino, serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
+  font-family:Palatino, serif;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
-h1 {
-  font-size: 22px;
-  margin: 14px 0 6px;
+h1{
+  font-size:22px;
+  margin:14px 0 6px;
 }
 
-.separator {
-  width: 100%;
-  height: 1px;
-  margin: 6px 0;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.25), transparent);
+.separator{
+  width:100%;
+  height:1px;
+  margin:6px 0;
+  background:linear-gradient(to right,transparent,rgba(255,255,255,.25),transparent);
 }
 
 /* ===== Hauptuhr ===== */
-.clock-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.clock{
+  width:120px;
+  height:120px;
+  border:2px solid #fff;
+  border-radius:50%;
+  position:relative;
+  margin:6px 0;
 }
 
-.clock {
-  width: 130px;
-  height: 130px;
-  border: 2px solid white;
-  border-radius: 50%;
-  position: relative;
-  margin: 6px 0;
+.hand{
+  position:absolute;
+  width:50%;
+  height:2px;
+  background:#fff;
+  top:50%;
+  left:50%;
+  transform-origin:left center;
 }
 
-.hand {
-  position: absolute;
-  width: 50%;
-  height: 2px;
-  background: white;
-  top: 50%;
-  left: 50%;
-  transform-origin: left center;
-}
+.hour{height:3px}
 
-.hour { height: 3px; }
-
-#main-date {
-  font-size: 14px;
-  margin-bottom: 6px;
+#date{
+  font-size:14px;
+  margin-bottom:6px;
 }
 
 /* ===== Märkte ===== */
-.markets {
-  display: flex;
-  justify-content: center;
-  gap: 28px;
-  font-size: 13px;
-  margin: 6px 0;
+.markets{
+  display:flex;
+  gap:28px;
+  font-size:13px;
+  margin:6px 0;
 }
 
-.market {
-  padding-left: 12px;
-  border-left: 1px solid rgba(255,255,255,0.3);
+.market{
+  padding-left:12px;
+  border-left:1px solid rgba(255,255,255,.3);
 }
 
 /* ===== News ===== */
-.news {
-  width: 90%;
-  font-size: 13px; /* KLEINER – wie Märkte */
-  text-align: center;
+#news{
+  width:90%;
+  font-size:13px;
+  text-align:center;
 }
-
-.news div {
-  margin: 4px 0;
-}
+#news div{margin:4px 0}
 
 /* ===== Weltuhren ===== */
-.world-clocks {
-  display: flex;
-  gap: 16px;
-  margin-top: 10px;
+.world{
+  display:flex;
+  gap:16px;
+  margin-top:10px;
 }
 
-.small-clock {
-  width: 42px;
-  height: 42px;
-  border: 1px solid white;
-  border-radius: 50%;
-  position: relative;
+.small{
+  width:42px;
+  height:42px;
+  border:1px solid #fff;
+  border-radius:50%;
+  position:relative;
 }
 
 /* ===== Logo ===== */
-#logo {
-  margin-top: 6px;
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 600;
+#logo{
+  margin-top:6px;
+  width:28px;
+  height:28px;
+  border:1px solid rgba(255,255,255,.4);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:600;
 }
 </style>
 </head>
@@ -122,13 +112,11 @@ h1 {
 <h1>Hallo Noel!</h1>
 <div class="separator"></div>
 
-<div class="clock-container">
-  <div class="clock">
-    <div class="hand hour" id="main-hour"></div>
-    <div class="hand minute" id="main-minute"></div>
-  </div>
-  <div id="main-date"></div>
+<div class="clock">
+  <div class="hand hour" id="h"></div>
+  <div class="hand minute" id="m"></div>
 </div>
+<div id="date"></div>
 
 <div class="separator"></div>
 
@@ -140,86 +128,84 @@ h1 {
 
 <div class="separator"></div>
 
-<div class="news" id="news">Nachrichten werden geladen…</div>
+<div id="news">Nachrichten werden geladen…</div>
 
 <div class="separator"></div>
 
-<div class="world-clocks">
-  <div class="small-clock" id="atlanta"><div class="hand hour"></div><div class="hand minute"></div></div>
-  <div class="small-clock" id="seoul"><div class="hand hour"></div><div class="hand minute"></div></div>
-  <div class="small-clock" id="beijing"><div class="hand hour"></div><div class="hand minute"></div></div>
-  <div class="small-clock" id="tokyo"><div class="hand hour"></div><div class="hand minute"></div></div>
+<div class="world">
+  <div class="small" id="atl"><div class="hand hour"></div><div class="hand minute"></div></div>
+  <div class="small" id="seo"><div class="hand hour"></div><div class="hand minute"></div></div>
+  <div class="small" id="bei"><div class="hand hour"></div><div class="hand minute"></div></div>
+  <div class="small" id="tok"><div class="hand hour"></div><div class="hand minute"></div></div>
 </div>
 
 <div id="logo">NG</div>
 
 <script>
-/* ===== Uhren ===== */
-function updateMainClock() {
-  const n = new Date();
-  const h = n.getHours() % 12;
-  const m = n.getMinutes();
+/* ===== Hauptuhr (FIX: echte Referenzen) ===== */
+const hEl=document.getElementById("h");
+const mEl=document.getElementById("m");
+const dateEl=document.getElementById("date");
 
-  main-hour.style.transform = `rotate(${h*30 + m*0.5}deg)`;
-  main-minute.style.transform = `rotate(${m*6}deg)`;
+function updateClock(){
+  const d=new Date();
+  const h=d.getHours()%12;
+  const m=d.getMinutes();
 
-  main-date.textContent = n.toLocaleDateString("de-DE", {
-    weekday:"long", day:"numeric", month:"long", year:"numeric"
-  });
+  hEl.style.transform=`rotate(${h*30+m*.5}deg)`;
+  mEl.style.transform=`rotate(${m*6}deg)`;
+
+  dateEl.textContent=d.toLocaleDateString("de-DE",
+    {weekday:"long",day:"numeric",month:"long",year:"numeric"});
 }
+setInterval(updateClock,1000);
+updateClock();
 
-function updateSmallClock(el, offset) {
-  const d = new Date();
-  d.setHours(d.getHours() + offset);
-  const h = d.getHours() % 12;
-  const m = d.getMinutes();
-
-  el.children[0].style.transform = `rotate(${h*30 + m*0.5}deg)`;
-  el.children[1].style.transform = `rotate(${m*6}deg)`;
+/* ===== Weltuhren ===== */
+function smallClock(id,offset){
+  const el=document.getElementById(id);
+  const d=new Date();
+  d.setHours(d.getHours()+offset);
+  const h=d.getHours()%12;
+  const m=d.getMinutes();
+  el.children[0].style.transform=`rotate(${h*30+m*.5}deg)`;
+  el.children[1].style.transform=`rotate(${m*6}deg)`;
 }
+setInterval(()=>{
+  smallClock("atl",-6);
+  smallClock("seo",8);
+  smallClock("bei",7);
+  smallClock("tok",8);
+},1000);
 
-setInterval(() => {
-  updateMainClock();
-  updateSmallClock(atlanta, -6);
-  updateSmallClock(seoul, 8);
-  updateSmallClock(beijing, 7);
-  updateSmallClock(tokyo, 8);
-}, 1000);
-
-updateMainClock();
-
-/* ===== Märkte (stabil, wie funktionierend) ===== */
-async function loadMarkets() {
-  try {
-    const r = await fetch(
+/* ===== Märkte (wie funktionierende Version) ===== */
+async function markets(){
+  try{
+    const r=await fetch(
       "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=eur&include_24hr_change=true"
     );
-    const d = await r.json();
-
-    btc.textContent = `Bitcoin €${Math.round(d.bitcoin.eur)} (${d.bitcoin.eur_24h_change.toFixed(1)}%)`;
-    eth.textContent = `Ethereum €${Math.round(d.ethereum.eur)} (${d.ethereum.eur_24h_change.toFixed(1)}%)`;
-    sol.textContent = `Solana €${Math.round(d.solana.eur)} (${d.solana.eur_24h_change.toFixed(1)}%)`;
-  } catch {
-    btc.textContent = "Marktdaten nicht verfügbar";
+    const d=await r.json();
+    btc.textContent=`Bitcoin €${Math.round(d.bitcoin.eur)} (${d.bitcoin.eur_24h_change.toFixed(1)}%)`;
+    eth.textContent=`Ethereum €${Math.round(d.ethereum.eur)} (${d.ethereum.eur_24h_change.toFixed(1)}%)`;
+    sol.textContent=`Solana €${Math.round(d.solana.eur)} (${d.solana.eur_24h_change.toFixed(1)}%)`;
+  }catch{
+    btc.textContent="Marktdaten nicht verfügbar";
   }
 }
-loadMarkets();
-setInterval(loadMarkets, 120000);
+markets(); setInterval(markets,120000);
 
-/* ===== News (maximal robust, Tagesschau) ===== */
-async function loadNews() {
-  try {
-    const r = await fetch("https://www.tagesschau.de/api2/news");
-    const d = await r.json();
-    const items = d.news.slice(0, 5);
-
-    news.innerHTML = items.map(n => `<div>${n.title}</div>`).join("");
-  } catch {
-    news.textContent = "Nachrichten derzeit nicht verfügbar";
+/* ===== News (ROBUST wie vorhin) ===== */
+async function newsLoad(){
+  try{
+    const r=await fetch("https://www.tagesschau.de/api2/news");
+    const d=await r.json();
+    if(!d.news||!d.news.length) throw "leer";
+    news.innerHTML=d.news.slice(0,5).map(n=>`<div>${n.title}</div>`).join("");
+  }catch{
+    news.textContent="Nachrichten derzeit nicht verfügbar";
   }
 }
-loadNews();
-setInterval(loadNews, 300000);
+newsLoad(); setInterval(newsLoad,300000);
 </script>
 
 </body>
